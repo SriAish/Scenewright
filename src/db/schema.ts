@@ -106,6 +106,12 @@ export const entities = pgTable(
     data: jsonb("data").notNull(),
     backstoryJson: jsonb("backstory_json"),
     imagePath: text("image_path"),
+    // Null for entities created directly (manual creation, generation,
+    // SRD add): they have no lineage relationship yet, and are their
+    // own root. Set only by the fork service (later build step), which
+    // must resolve an entity's effective root as
+    // COALESCE(lineage_root_id, id) rather than assume the column is
+    // always populated. Confirmed 2026-07-10.
     lineageRootId: uuid("lineage_root_id").references((): AnyPgColumn => entities.id),
     srdSourceId: uuid("srd_source_id").references(() => srdEntries.id),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),

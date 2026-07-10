@@ -27,7 +27,7 @@
   --ink-600: oklch(0.4 0.02 260);
   --ink-500: oklch(0.45 0.02 260);
   --ink-400: oklch(0.55 0.015 260);
-  --ink-350: oklch(0.62 0.01 260);
+  --ink-350: oklch(0.62 0.01 260); /* also the graph view's edge stroke color, source: graph view canvas edge paths */
 
   /* ---- Neutral pill (draft / not_run) ---- */
   --neutral-pill-bg: oklch(0.91 0 0);
@@ -140,6 +140,10 @@
   --color-danger-text: var(--danger-text);
   --color-danger-border: var(--danger-border);
   --color-danger-bg-hover: var(--danger-bg-hover);
+
+  /* Graph view (source: graph view canvas, edge paths and dot grid; the
+     dot color is numerically identical to border-default) */
+  --color-graph-edge: var(--ink-350);
 
   /* Modal */
   --color-modal-scrim: var(--modal-scrim);

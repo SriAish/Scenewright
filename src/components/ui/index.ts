@@ -10,3 +10,4 @@ export * from "./ModalChassis";
 export * from "./EmptyState";
 export * from "./Input";
 export * from "./Textarea";
+export * from "./Toggle";
