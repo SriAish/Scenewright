@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm root *)",
+      "Bash(find / -maxdepth 6 -type d -name \"playwright\" -path \"*/node_modules/*\")",
+      "Read(//Users/aish/.npm/_npx/**)",
+      "Bash(ln -sfn /Users/aish/.npm/_npx/361ceb562f3b3235/node_modules /private/tmp/claude-501/-Users-aish-Documents-Scenewright/def831c6-3547-45a4-899d-3894ce2f70ef/scratchpad/node_modules)",
+      "Bash(node verify.mjs)",
+      "Bash(node isolation-check.mjs)",
+      "Bash(node verify6.mjs)",
+      "Bash(rm -f \"/private/tmp/claude-501/-Users-aish-Documents-Scenewright/def831c6-3547-45a4-899d-3894ce2f70ef/scratchpad/node_modules\")",
+      "Bash(git -C /Users/aish/Documents/Scenewright status --short)"
+    ]
+  }
+}

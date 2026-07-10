@@ -44,3 +44,25 @@ export function PlusIcon({ size = 12, className }: IconProps) {
     </svg>
   );
 }
+
+/**
+ * Three-dot overflow glyph, path copied verbatim from the campaign
+ * header and entity detail rail's overflow buttons in the design
+ * system. Not yet split into its own component prior to this step.
+ */
+export function MoreIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size * 0.25}
+      viewBox="0 0 16 4"
+      fill="none"
+      className={className}
+      aria-hidden
+    >
+      <circle cx="2" cy="2" r="1.7" fill="currentColor" />
+      <circle cx="8" cy="2" r="1.7" fill="currentColor" />
+      <circle cx="14" cy="2" r="1.7" fill="currentColor" />
+    </svg>
+  );
+}

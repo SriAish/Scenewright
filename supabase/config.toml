@@ -1,3 +1,10 @@
+# WARNING: local development config only.
+# Do not run "supabase config push". It replaces the LIVE project's
+# auth configuration with this file, overwriting the real site_url,
+# redirect URLs, and mailer_autoconfirm with local-dev placeholders.
+# Live auth settings are managed in the Supabase dashboard only.
+# Migrations are unaffected; "supabase db push" remains safe.
+
 # For detailed configuration reference documentation, visit:
 # https://supabase.com/docs/guides/local-development/cli/config
 # A string used to distinguish different Supabase projects on the same host. Defaults to the

@@ -11,6 +11,7 @@ import {
   real,
   text,
   timestamp,
+  uniqueIndex,
   uuid,
   vector,
 } from "drizzle-orm/pg-core";
@@ -126,7 +127,9 @@ export const srdEntries = pgTable(
     name: text("name").notNull(),
     data: jsonb("data").notNull(),
     searchText: text("search_text").notNull(),
-    embedding: vector("embedding", { dimensions: 384 }).notNull(),
+    // Nullable: rows exist between import and embed precompute, and
+    // between hand-adding an entry and its next incremental embed run.
+    embedding: vector("embedding", { dimensions: 384 }),
     cr: numeric("cr"),
     monsterType: text("monster_type"),
     size: text("size"),
@@ -138,7 +141,10 @@ export const srdEntries = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [check("srd_entries_type_check", sql`${table.type} in ('monster', 'item')`)],
+  (table) => [
+    check("srd_entries_type_check", sql`${table.type} in ('monster', 'item')`),
+    uniqueIndex("srd_entries_type_name_idx").on(table.type, table.name),
+  ],
 );
 
 export const mentions = pgTable(

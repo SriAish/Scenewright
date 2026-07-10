@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# supabase local dev artifacts (keep config.toml and migrations tracked)
+supabase/.temp
+supabase/.branches
+
+# transformers.js downloaded model weights, if cached into the repo
+.cache
