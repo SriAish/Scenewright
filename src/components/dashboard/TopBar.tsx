@@ -7,10 +7,12 @@ import { useQueryClient } from "@tanstack/react-query";
 export interface TopBarProps {
   userEmail: string;
   signOutAction: () => Promise<void>;
+  /** True on the library page itself, so its nav link renders active per screen 13's frame. */
+  libraryActive?: boolean;
 }
 
 /** App-level top bar, shared by the dashboard, library, and directory screens. */
-export function TopBar({ userEmail, signOutAction }: TopBarProps) {
+export function TopBar({ userEmail, signOutAction, libraryActive = false }: TopBarProps) {
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -34,7 +36,10 @@ export function TopBar({ userEmail, signOutAction }: TopBarProps) {
         Scenewright
       </span>
       <div className="flex-1" />
-      <Link href="/library" className="text-ui font-medium text-text-secondary hover:text-link">
+      <Link
+        href="/library"
+        className={`text-ui font-medium hover:text-link ${libraryActive ? "text-accent" : "text-text-secondary"}`}
+      >
         Library
       </Link>
       <div className="relative" ref={menuRef}>

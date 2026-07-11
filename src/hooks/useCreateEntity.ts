@@ -2,14 +2,14 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EntityType } from "@/components/ui";
-import { Entity, entitiesQueryKey } from "./useEntities";
+import { Entity, EntityScope, entitiesQueryKey, entityScopeBasePath } from "./useEntities";
 
 export interface CreateEntityInput {
   name: string;
 }
 
-async function createEntity(campaignId: string, type: EntityType, input: CreateEntityInput): Promise<Entity> {
-  const response = await fetch(`/api/campaigns/${campaignId}/entities`, {
+async function createEntity(scope: EntityScope, type: EntityType, input: CreateEntityInput): Promise<Entity> {
+  const response = await fetch(entityScopeBasePath(scope), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ type, ...input }),
@@ -20,13 +20,13 @@ async function createEntity(campaignId: string, type: EntityType, input: CreateE
   return response.json();
 }
 
-export function useCreateEntity(campaignId: string, type: EntityType) {
+export function useCreateEntity(scope: EntityScope, type: EntityType) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: CreateEntityInput) => createEntity(campaignId, type, input),
+    mutationFn: (input: CreateEntityInput) => createEntity(scope, type, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(campaignId, type) });
+      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(scope, type) });
     },
   });
 }

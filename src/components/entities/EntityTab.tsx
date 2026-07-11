@@ -4,10 +4,11 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, EmptyState, EntityCard, EntityType, PlusIcon } from "@/components/ui";
 import { useCreateEntity } from "@/hooks/useCreateEntity";
-import { useEntities } from "@/hooks/useEntities";
+import { campaignScope, useEntities } from "@/hooks/useEntities";
 import { FinderModal } from "./finder/FinderModal";
 import { NpcGenerationModal } from "./generation/NpcGenerationModal";
 import { NewEntityModal } from "./NewEntityModal";
+import { ImportModal } from "./ImportModal";
 
 const TAB_META: Record<EntityType, { searchPlaceholder: string; singular: string; emptyHeading: string }> = {
   npc: { searchPlaceholder: "Search characters...", singular: "character", emptyHeading: "No characters yet" },
@@ -31,14 +32,16 @@ export interface EntityTabProps {
 export function EntityTab({ campaignId, type }: EntityTabProps) {
   const router = useRouter();
   const meta = TAB_META[type];
-  const { data: entities, isLoading } = useEntities(campaignId, type);
-  const createEntity = useCreateEntity(campaignId, type);
+  const scope = campaignScope(campaignId);
+  const { data: entities, isLoading } = useEntities(scope, type);
+  const createEntity = useCreateEntity(scope, type);
   const isSrdType = type === "monster" || type === "item";
 
   const [search, setSearch] = useState("");
   const [newEntityOpen, setNewEntityOpen] = useState(false);
   const [finderOpen, setFinderOpen] = useState(false);
   const [generationOpen, setGenerationOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
 
   const filtered = useMemo(() => {
     if (!entities) return [];
@@ -67,7 +70,7 @@ export function EntityTab({ campaignId, type }: EntityTabProps) {
           className="flex-1 max-w-[320px] text-content text-text-primary bg-surface-card border border-border-soft rounded-sm px-[14px] py-[9px] outline-none placeholder:text-text-placeholder"
         />
         <div className="flex-1" />
-        <Button variant="secondary" disabled title="Coming soon">
+        <Button variant="secondary" onClick={() => setImportOpen(true)}>
           Import
         </Button>
         {isSrdType ? (
@@ -134,6 +137,9 @@ export function EntityTab({ campaignId, type }: EntityTabProps) {
       )}
       {generationOpen && type === "npc" && (
         <NpcGenerationModal campaignId={campaignId} onClose={() => setGenerationOpen(false)} />
+      )}
+      {importOpen && (
+        <ImportModal campaignId={campaignId} type={type} onClose={() => setImportOpen(false)} />
       )}
     </div>
   );

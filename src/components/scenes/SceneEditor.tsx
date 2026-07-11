@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { BackIcon, Button, ChevronDownIcon, CloseIcon, IconButton, StatusPill } from "@/components/ui";
 import { formatRelativeTime } from "@/components/dashboard/relativeTime";
+import { campaignScope } from "@/hooks/useEntities";
 import { SceneDetail, useScene } from "@/hooks/useScene";
 import { useUpdateScene } from "@/hooks/useUpdateScene";
 import { SceneStatus } from "@/hooks/useScenes";
@@ -212,21 +213,21 @@ function SceneEditorLoaded({
 
           <MentionEditor
             label="Start"
-            campaignId={campaignId}
+            scope={campaignScope(campaignId)}
             value={scene.startJson}
             placeholder="How does this scene begin?"
             onSave={(doc) => handleFieldSave("startJson", doc)}
           />
           <MentionEditor
             label="Narration"
-            campaignId={campaignId}
+            scope={campaignScope(campaignId)}
             value={scene.narrationJson}
             placeholder="Write the scene. Type @ to mention a character, monster, or item…"
             onSave={(doc) => handleFieldSave("narrationJson", doc)}
           />
           <MentionEditor
             label="End"
-            campaignId={campaignId}
+            scope={campaignScope(campaignId)}
             value={scene.endJson}
             placeholder="How does this scene resolve?"
             onSave={(doc) => handleFieldSave("endJson", doc)}

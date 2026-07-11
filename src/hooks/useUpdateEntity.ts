@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EntityType } from "@/components/ui";
-import { Entity, entitiesQueryKey, ItemData, MonsterData, NpcData } from "./useEntities";
+import { Entity, EntityScope, entitiesQueryKey, entityScopeBasePath, ItemData, MonsterData, NpcData } from "./useEntities";
 
 export interface UpdateEntityInput {
   id: string;
@@ -14,10 +14,10 @@ export interface UpdateEntityInput {
 }
 
 async function updateEntity(
-  campaignId: string,
+  scope: EntityScope,
   { id, ...values }: UpdateEntityInput,
 ): Promise<Entity> {
-  const response = await fetch(`/api/campaigns/${campaignId}/entities/${id}`, {
+  const response = await fetch(`${entityScopeBasePath(scope)}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(values),
@@ -46,14 +46,14 @@ interface MutationContext {
   overwrite it. Chaining guarantees they reach the server in the order
   they were made.
 */
-export function useUpdateEntity(campaignId: string, type: EntityType) {
+export function useUpdateEntity(scope: EntityScope, type: EntityType) {
   const queryClient = useQueryClient();
-  const queryKey = entitiesQueryKey(campaignId, type);
+  const queryKey = entitiesQueryKey(scope, type);
   const queueRef = useRef<Promise<unknown>>(Promise.resolve());
 
   return useMutation<Entity, Error, UpdateEntityInput, MutationContext>({
     mutationFn: (input) => {
-      const run = () => updateEntity(campaignId, input);
+      const run = () => updateEntity(scope, input);
       const result = queueRef.current.then(run, run);
       queueRef.current = result.catch(() => {});
       return result;

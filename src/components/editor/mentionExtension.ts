@@ -3,6 +3,7 @@ import TiptapMention, { type MentionOptions } from "@tiptap/extension-mention";
 import { PluginKey } from "@tiptap/pm/state";
 import type { SuggestionOptions, SuggestionProps } from "@tiptap/suggestion";
 import { ReactNodeViewRenderer, ReactRenderer } from "@tiptap/react";
+import { EntityScope, entityScopeBasePath } from "@/hooks/useEntities";
 import { MentionDropdown, type MentionDropdownHandle } from "./MentionDropdown";
 import { MentionNodeView } from "./MentionNodeView";
 import type { MentionCommandPayload, MentionEntityType, MentionSearchResult } from "./types";
@@ -88,7 +89,7 @@ function insertMention(editor: Editor, range: Range, id: string, entityType: Men
 
 export interface BuildMentionSuggestionOptions {
   char: string;
-  campaignId: string;
+  scope: EntityScope;
   onEntityCreated: (entityType: MentionEntityType) => void;
 }
 
@@ -100,7 +101,7 @@ export interface BuildMentionSuggestionOptions {
  */
 export function buildMentionSuggestion({
   char,
-  campaignId,
+  scope,
   onEntityCreated,
 }: BuildMentionSuggestionOptions): Omit<SuggestionOptions<MentionSearchResult, MentionAttrs>, "editor"> {
   // Built internally against MentionCommandPayload (a superset of what the
@@ -124,7 +125,7 @@ export function buildMentionSuggestion({
     debounce: 200,
     items: async ({ query, signal }) => {
       const response = await fetch(
-        `/api/campaigns/${campaignId}/entities/search?q=${encodeURIComponent(query)}`,
+        `${entityScopeBasePath(scope)}/search?q=${encodeURIComponent(query)}`,
         { signal },
       );
       if (!response.ok) return [];
@@ -136,7 +137,7 @@ export function buildMentionSuggestion({
         return;
       }
 
-      const response = await fetch(`/api/campaigns/${campaignId}/entities`, {
+      const response = await fetch(entityScopeBasePath(scope), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ type: props.entityType, name: props.name }),

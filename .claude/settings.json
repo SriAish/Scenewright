@@ -127,13 +127,26 @@
       "Bash(ps -p 3913 -o pid,etime,stat)",
       "Bash(kill -QUIT 3913)",
       "Bash(echo \"PID: $!\")",
-      "Bash(pkill -f \"next dev\" 2>/dev/null *)"
+      "Bash(pkill -f \"next dev\" 2>/dev/null *)",
+      "Bash(mkdir -p \"/Users/aish/Documents/Scenewright/src/app/api/campaigns/[id]/entities/[entityId]/save-to-library\")",
+      "Bash(mkdir -p \"/Users/aish/Documents/Scenewright/src/app/library/entities/[entityId]\")",
+      "Bash(find /Users/aish/Documents/Scenewright/src/app/sign-in -type f; echo \"---\"; sed -n '1,80p' /Users/aish/Documents/Scenewright/src/app/sign-in/*.tsx 2>/dev/null | head -120)",
+      "Bash(node /private/tmp/claude-501/-Users-aish-Documents-Scenewright/d99ef6cd-7c6d-4606-8509-cac977b5c443/scratchpad/verify-import-library.mjs)",
+      "Bash(node verify-import-library.mjs)",
+      "Bash(echo \"ESLINT_EXIT=$?\")",
+      "Bash(node verify-backstory-mentions.mjs)",
+      "Bash(grep -o \"Mention an entity.\\\\{0,600\\\\}\" /tmp/debug-page.html)",
+      "Bash(sed -i '' 's/page.on\\(\"pageerror\", \\(err\\) => console.log\\(\"\\\\[pageerror\\\\]\", err.message\\)\\);/page.on\\(\"pageerror\", \\(err\\) => console.log\\(\"[pageerror]\", err.message\\)\\);\\\\npage.on\\(\"request\", \\(req\\) => { if \\(req.url\\(\\).includes\\(\"\\\\/entities\\\\/search\"\\)\\) console.log\\(\"[request]\", req.url\\(\\)\\); }\\);/' debug-backstory.mjs)",
+      "Bash(node debug-backstory.mjs)"
     ],
     "additionalDirectories": [
       "/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes",
       "/Users/aish/Documents/Scenewright/src/app/api/campaigns/[id]/entities",
       "/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes/[sceneId]",
-      "/tmp"
+      "/tmp",
+      "/Users/aish/Documents/Scenewright/src/app/api/campaigns/[id]/entities/[entityId]",
+      "/Users/aish/Documents/Scenewright/src/app/library/entities",
+      "/Users/aish/Documents/Scenewright/src/app/sign-in"
     ]
   }
 }

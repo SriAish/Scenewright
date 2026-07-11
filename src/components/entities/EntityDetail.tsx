@@ -13,10 +13,12 @@ import {
   ModalChassis,
   MoreIcon,
 } from "@/components/ui";
-import { ItemData, MonsterData, NpcData } from "@/hooks/useEntities";
+import { campaignScope, EntityScope, ItemData, libraryScope, MonsterData, NpcData } from "@/hooks/useEntities";
 import { useDeleteEntity } from "@/hooks/useDeleteEntity";
 import { useUpdateEntity } from "@/hooks/useUpdateEntity";
-import { docToLines, isPlainTextDoc, linesToDoc } from "@/lib/tiptapPlainText";
+import { useBackstoryReferences } from "@/hooks/useBackstoryReferences";
+import { useSaveToLibrary } from "@/hooks/useSaveToLibrary";
+import { BackstoryReferenceConfirmModal } from "./BackstoryReferenceConfirmModal";
 import { EntityPortrait } from "./EntityPortrait";
 import { ItemFields } from "./ItemFields";
 import { MonsterFields } from "./MonsterFields";
@@ -30,9 +32,13 @@ export interface AppearsInRow {
   href: string;
 }
 
+/** Which scope this detail page is rendering against: one campaign, or the library. */
+export type EntityDetailScope =
+  | { type: "campaign"; campaignId: string; campaignTitle: string }
+  | { type: "library" };
+
 export interface EntityDetailProps {
-  campaignId: string;
-  campaignTitle: string;
+  scope: EntityDetailScope;
   entity: {
     id: string;
     type: EntityType;
@@ -41,32 +47,34 @@ export interface EntityDetailProps {
     data: NpcData | MonsterData | ItemData;
     backstoryJson: unknown;
   };
-  /** Name of the srd_entries row this entity was forked from, or null when it wasn't SRD-derived. */
+  /** Name of the srd_entries row this entity was forked from, or null when it wasn't SRD-derived (never set on a fork copy). */
   srdSourceName?: string | null;
+  /** "Library" or a campaign title, when this entity is a forked copy; root-derived per src/lib/registry. */
+  copiedFrom?: string | null;
+  /** Campaign-scoped entities only: whether no library entity shares this entity's lineage yet. */
+  canSaveToLibrary?: boolean;
   /** Scenes and backstories mentioning this entity, from the mentions reverse-lookup. */
   appearsIn?: AppearsInRow[];
 }
 
-interface BackstoryState {
-  editable: boolean;
-  text: string;
-}
-
-function initBackstory(doc: unknown): BackstoryState {
-  const editable = isPlainTextDoc(doc);
-  return { editable, text: editable ? docToLines(doc).join("\n") : "" };
+function toEntityScope(scope: EntityDetailScope): EntityScope {
+  return scope.type === "campaign" ? campaignScope(scope.campaignId) : libraryScope;
 }
 
 /**
  * Entity detail / edit, screen 9: two-column layout, edit-in-place (no
- * Save button or Edit toggle, per the design frame). No generation, no
- * import, no finder, no library, no mentions, no save-to-library in
- * this build step.
+ * Save button or Edit toggle, per the design frame). Reused against
+ * both campaign and library scope (screen 13's library entity detail
+ * is this same component). No generation, no import, no finder in this
+ * build step.
  */
-export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName, appearsIn = [] }: EntityDetailProps) {
+export function EntityDetail({ scope, entity, srdSourceName, copiedFrom, canSaveToLibrary = false, appearsIn = [] }: EntityDetailProps) {
   const router = useRouter();
-  const updateEntity = useUpdateEntity(campaignId, entity.type);
-  const deleteEntity = useDeleteEntity(campaignId, entity.type);
+  const entityScope = toEntityScope(scope);
+  const updateEntity = useUpdateEntity(entityScope, entity.type);
+  const deleteEntity = useDeleteEntity(entityScope, entity.type);
+  const backstoryReferences = useBackstoryReferences();
+  const saveToLibrary = useSaveToLibrary(entity.type);
 
   const [name, setName] = useState(entity.name);
   const [isEditingName, setEditingName] = useState(false);
@@ -76,11 +84,13 @@ export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName,
   const [summaryDraft, setSummaryDraft] = useState(entity.summary);
 
   const [data, setData] = useState<Record<string, unknown>>(entity.data as Record<string, unknown>);
-  const [backstory, setBackstory] = useState<BackstoryState>(() => initBackstory(entity.backstoryJson));
 
   const [overflowOpen, setOverflowOpen] = useState(false);
   const overflowRef = useRef<HTMLDivElement>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const [savedToLibrary, setSavedToLibrary] = useState(false);
+  const [pendingSave, setPendingSave] = useState<{ names: string[] } | null>(null);
 
   useEffect(() => {
     if (!overflowOpen) return;
@@ -117,24 +127,38 @@ export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName,
     updateEntity.mutate({ id: entity.id, data: next });
   }
 
-  function commitBackstory() {
-    updateEntity.mutate({ id: entity.id, backstoryJson: linesToDoc(backstory.text.split("\n")) });
-  }
-
   function handleDelete() {
     deleteEntity.mutate(entity.id);
-    router.push(`/campaigns/${campaignId}`);
+    router.push(scope.type === "campaign" ? `/campaigns/${scope.campaignId}` : "/library");
+  }
+
+  async function handleSaveToLibraryClick() {
+    if (scope.type !== "campaign") return;
+    const result = await backstoryReferences.mutateAsync({ entityId: entity.id, target: "library" });
+    if (result.names.length === 0) {
+      await saveToLibrary.mutateAsync({ campaignId: scope.campaignId, entityId: entity.id, mentionStrategy: "flatten" });
+      setSavedToLibrary(true);
+      return;
+    }
+    setPendingSave({ names: result.names });
+  }
+
+  async function handleConfirmSave(mentionStrategy: "flatten" | "copyReferenced") {
+    if (scope.type !== "campaign") return;
+    await saveToLibrary.mutateAsync({ campaignId: scope.campaignId, entityId: entity.id, mentionStrategy });
+    setPendingSave(null);
+    setSavedToLibrary(true);
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-surface-panel">
       <div className="flex items-center gap-md px-xl py-base border-b border-border-default bg-surface-card-solid sticky top-0 z-20">
         <Link
-          href={`/campaigns/${campaignId}`}
+          href={scope.type === "campaign" ? `/campaigns/${scope.campaignId}` : "/library"}
           className="inline-flex items-center gap-sm text-ui font-medium text-text-secondary hover:bg-surface-panel rounded-sm px-sm py-[6px]"
         >
           <BackIcon />
-          {campaignTitle}
+          {scope.type === "campaign" ? scope.campaignTitle : "Library"}
         </Link>
         <span className="text-border-default">|</span>
         <span className="text-nav text-text-secondary">{TAB_LABEL[entity.type]}</span>
@@ -189,10 +213,9 @@ export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName,
             <NpcFields
               data={data as NpcData}
               onCommit={(next) => commitData(next)}
-              backstoryText={backstory.text}
-              backstoryEditable={backstory.editable}
-              onBackstoryChange={(text) => setBackstory((prev) => ({ ...prev, text }))}
-              onBackstoryBlur={commitBackstory}
+              scope={entityScope}
+              backstoryJson={entity.backstoryJson}
+              onBackstorySave={(doc) => updateEntity.mutate({ id: entity.id, backstoryJson: doc })}
             />
           )}
           {entity.type === "monster" && <MonsterFields data={data as MonsterData} onCommit={(next) => commitData(next)} />}
@@ -219,10 +242,33 @@ export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName,
             )}
           </div>
 
-          {srdSourceName && (
+          {copiedFrom && (
+            <div className="flex items-center gap-sm text-micro text-text-placeholder">
+              <MapIcon size={12} />
+              Copied from {copiedFrom}
+            </div>
+          )}
+          {!copiedFrom && srdSourceName && (
             <div className="flex items-center gap-sm text-micro text-text-placeholder">
               <MapIcon size={12} />
               Based on SRD: {srdSourceName}
+            </div>
+          )}
+
+          {scope.type === "campaign" && (canSaveToLibrary || savedToLibrary) && (
+            <div>
+              {savedToLibrary ? (
+                <span className="text-micro text-text-secondary">Saved to library.</span>
+              ) : (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleSaveToLibraryClick}
+                  disabled={backstoryReferences.isPending || saveToLibrary.isPending}
+                >
+                  {backstoryReferences.isPending || saveToLibrary.isPending ? "Working..." : "Save to library"}
+                </Button>
+              )}
             </div>
           )}
 
@@ -273,6 +319,18 @@ export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName,
             recovered from the database but not from the app.
           </p>
         </ModalChassis>
+      )}
+
+      {pendingSave && (
+        <BackstoryReferenceConfirmModal
+          entityName={name}
+          names={pendingSave.names}
+          onBack={() => setPendingSave(null)}
+          onClose={() => setPendingSave(null)}
+          onConfirm={handleConfirmSave}
+          isSubmitting={saveToLibrary.isPending}
+          submitLabel="Save"
+        />
       )}
     </div>
   );

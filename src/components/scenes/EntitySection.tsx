@@ -12,7 +12,7 @@ import {
   entityColorClasses,
   entityTypeLabel,
 } from "@/components/ui";
-import { useEntities } from "@/hooks/useEntities";
+import { campaignScope, useEntities } from "@/hooks/useEntities";
 import { useAddSceneEntity, useRemoveSceneEntity } from "@/hooks/useSceneEntities";
 import type { SceneSidebarEntity } from "@/hooks/useScene";
 
@@ -44,7 +44,7 @@ export function EntitySection({ campaignId, sceneId, type, label, entities }: En
 
   const addEntity = useAddSceneEntity(campaignId, sceneId);
   const removeEntity = useRemoveSceneEntity(campaignId, sceneId);
-  const { data: campaignEntities, refetch: refetchCampaignEntities } = useEntities(campaignId, type);
+  const { data: campaignEntities, refetch: refetchCampaignEntities } = useEntities(campaignScope(campaignId), type);
 
   const presentIds = useMemo(() => new Set(entities.map((entity) => entity.id)), [entities]);
   const pickerRows = useMemo(() => {

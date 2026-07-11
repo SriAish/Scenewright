@@ -44,7 +44,15 @@ export function MentionNodeView({ node }: ReactNodeViewProps) {
     <NodeViewWrapper as="span" style={{ position: "relative", display: "inline-block" }} contentEditable={false}>
       <span onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
         {resolved && !isDeleted && context ? (
-          <Link href={`/campaigns/${context.campaignId}/entities/${id}`}>{chip}</Link>
+          <Link
+            href={
+              context.scope.type === "campaign"
+                ? `/campaigns/${context.scope.campaignId}/entities/${id}`
+                : `/library/entities/${id}`
+            }
+          >
+            {chip}
+          </Link>
         ) : (
           chip
         )}

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { EditorContent, useEditor, useEditorState } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { useQueryClient } from "@tanstack/react-query";
-import { entitiesQueryKey } from "@/hooks/useEntities";
+import { EntityScope, entitiesQueryKey } from "@/hooks/useEntities";
 import { buildMentionSuggestion, Mention } from "./mentionExtension";
 import { MentionEditorProvider, useResolvedMentions } from "./MentionEditorContext";
 import type { MentionEntityType } from "./types";
@@ -19,8 +19,8 @@ export interface MentionEditorProps {
   /** Fires with the current doc JSON `saveDebounceMs` after the last edit (autosave). */
   onSave?: (doc: unknown) => void;
   saveDebounceMs?: number;
-  /** Campaign scope for autocomplete, create-from-mention, and chip name resolution. */
-  campaignId: string;
+  /** Scope (one campaign, or the library) for autocomplete, create-from-mention, and chip name resolution. */
+  scope: EntityScope;
   readOnly?: boolean;
   label?: string;
   placeholder?: string;
@@ -43,7 +43,7 @@ export function MentionEditor({
   onChange,
   onSave,
   saveDebounceMs = 1200,
-  campaignId,
+  scope,
   readOnly = false,
   label,
   placeholder,
@@ -51,10 +51,11 @@ export function MentionEditor({
 }: MentionEditorProps) {
   const queryClient = useQueryClient();
   const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const scopeKey = scope.type === "campaign" ? scope.campaignId : "library";
 
   const extensions = useMemo(() => {
     const onEntityCreated = (entityType: MentionEntityType) =>
-      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(campaignId, entityType) });
+      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(scope, entityType) });
 
     return [
       StarterKit.configure({
@@ -75,14 +76,14 @@ export function MentionEditor({
       }),
       Mention.configure({
         suggestions: [
-          buildMentionSuggestion({ char: "@", campaignId, onEntityCreated }),
-          buildMentionSuggestion({ char: "[[", campaignId, onEntityCreated }),
+          buildMentionSuggestion({ char: "@", scope, onEntityCreated }),
+          buildMentionSuggestion({ char: "[[", scope, onEntityCreated }),
         ],
       }),
     ];
-    // extensions must be rebuilt if the campaign scope changes; queryClient is stable.
+    // extensions must be rebuilt if the scope changes; queryClient is stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [campaignId]);
+  }, [scopeKey]);
 
   const editor = useEditor(
     {
@@ -98,7 +99,7 @@ export function MentionEditor({
         saveTimer.current = setTimeout(() => onSave(doc), saveDebounceMs);
       },
     },
-    [campaignId, readOnly],
+    [scopeKey, readOnly],
   );
 
   useEffect(
@@ -113,12 +114,12 @@ export function MentionEditor({
     selector: ({ editor }) => (editor ? editor.isEmpty : true),
   });
 
-  const resolved = useResolvedMentions(editor, campaignId);
+  const resolved = useResolvedMentions(editor, scope);
 
   return (
     <div className={`flex flex-col gap-sm ${className ?? ""}`}>
       {label && <span className="text-label font-semibold uppercase tracking-wider text-text-label">{label}</span>}
-      <MentionEditorProvider value={{ campaignId, resolved }}>
+      <MentionEditorProvider value={{ scope, resolved }}>
         <div className="relative border border-border-soft bg-surface-card rounded-lg px-lg py-base text-content leading-[1.65] text-text-primary">
           {isEmpty && placeholder && (
             <div className="pointer-events-none absolute text-text-placeholder select-none">{placeholder}</div>

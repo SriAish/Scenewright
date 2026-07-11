@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button, Toggle } from "@/components/ui";
 import { useCampaigns } from "@/hooks/useCampaigns";
+import { campaignScope } from "@/hooks/useEntities";
 import { useCreateScene } from "@/hooks/useCreateScene";
 import { useScenes } from "@/hooks/useScenes";
 import { useUpdateScene } from "@/hooks/useUpdateScene";
@@ -134,7 +135,7 @@ function ScratchSceneEditor({ campaignId }: { campaignId: string }) {
 
       <MentionEditor
         key={scratchScene.id}
-        campaignId={campaignId}
+        scope={campaignScope(campaignId)}
         value={scratchScene.narrationJson}
         readOnly={readOnly}
         label="Narration (scratch scene)"

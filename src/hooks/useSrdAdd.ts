@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EntityType } from "@/components/ui";
-import { Entity, entitiesQueryKey } from "./useEntities";
+import { campaignScope, Entity, entitiesQueryKey } from "./useEntities";
 
 export interface SrdAddInput {
   srdEntryId: string;
@@ -27,7 +27,7 @@ export function useSrdAdd(campaignId: string, type: EntityType) {
   return useMutation({
     mutationFn: (input: SrdAddInput) => addFromSrd(campaignId, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(campaignId, type) });
+      queryClient.invalidateQueries({ queryKey: entitiesQueryKey(campaignScope(campaignId), type) });
     },
   });
 }

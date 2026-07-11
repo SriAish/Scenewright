@@ -57,23 +57,45 @@ export interface Entity {
   srdSourceId: string | null;
   updatedAt: string;
   sceneCount: number;
+  /** Library rows only: "Saved from [campaign]" per screen 13, root-derived per src/lib/registry's provenance rule. */
+  copiedFrom?: string | null;
 }
 
-export function entitiesQueryKey(campaignId: string, type: EntityType) {
-  return ["campaigns", campaignId, "entities", type] as const;
+/**
+ * Every entity CRUD/query hook is scoped either to one campaign or to
+ * the library (campaign_id null), matching the two entity route trees
+ * (/api/campaigns/[id]/entities and /api/library/entities). Library
+ * scope carries no id since there's exactly one library per user.
+ */
+export type EntityScope = { type: "campaign"; campaignId: string } | { type: "library" };
+
+export function campaignScope(campaignId: string): EntityScope {
+  return { type: "campaign", campaignId };
 }
 
-async function fetchEntities(campaignId: string, type: EntityType): Promise<Entity[]> {
-  const response = await fetch(`/api/campaigns/${campaignId}/entities?type=${type}`);
+export const libraryScope: EntityScope = { type: "library" };
+
+export function entityScopeBasePath(scope: EntityScope): string {
+  return scope.type === "campaign" ? `/api/campaigns/${scope.campaignId}/entities` : "/api/library/entities";
+}
+
+export function entitiesQueryKey(scope: EntityScope, type: EntityType) {
+  return scope.type === "campaign"
+    ? (["campaigns", scope.campaignId, "entities", type] as const)
+    : (["library", "entities", type] as const);
+}
+
+async function fetchEntities(scope: EntityScope, type: EntityType): Promise<Entity[]> {
+  const response = await fetch(`${entityScopeBasePath(scope)}?type=${type}`);
   if (!response.ok) {
     throw new Error("Failed to load entities");
   }
   return response.json();
 }
 
-export function useEntities(campaignId: string, type: EntityType) {
+export function useEntities(scope: EntityScope, type: EntityType) {
   return useQuery({
-    queryKey: entitiesQueryKey(campaignId, type),
-    queryFn: () => fetchEntities(campaignId, type),
+    queryKey: entitiesQueryKey(scope, type),
+    queryFn: () => fetchEntities(scope, type),
   });
 }

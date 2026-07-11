@@ -4,10 +4,11 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { Editor } from "@tiptap/core";
 import { extractMentionedEntityIds } from "@/lib/mentions/extract";
+import { EntityScope, entityScopeBasePath } from "@/hooks/useEntities";
 import type { ResolvedMentionEntity } from "./types";
 
 export interface MentionEditorContextValue {
-  campaignId: string;
+  scope: EntityScope;
   resolved: Map<string, ResolvedMentionEntity>;
 }
 
@@ -19,13 +20,17 @@ export function useMentionEditorContext() {
   return useContext(MentionEditorContext);
 }
 
-async function fetchResolved(campaignId: string, ids: string[]): Promise<ResolvedMentionEntity[]> {
+async function fetchResolved(scope: EntityScope, ids: string[]): Promise<ResolvedMentionEntity[]> {
   if (ids.length === 0) return [];
   const response = await fetch(
-    `/api/campaigns/${campaignId}/entities/resolve?ids=${encodeURIComponent(ids.join(","))}`,
+    `${entityScopeBasePath(scope)}/resolve?ids=${encodeURIComponent(ids.join(","))}`,
   );
   if (!response.ok) return [];
   return response.json();
+}
+
+function resolveQueryKey(scope: EntityScope) {
+  return scope.type === "campaign" ? ["campaigns", scope.campaignId] : ["library"];
 }
 
 /**
@@ -34,7 +39,7 @@ async function fetchResolved(campaignId: string, ids: string[]): Promise<Resolve
  * freshly created stub being inserted). This is how renames and soft
  * deletes propagate into chip rendering without the doc itself changing.
  */
-export function useResolvedMentions(editor: Editor | null, campaignId: string): Map<string, ResolvedMentionEntity> {
+export function useResolvedMentions(editor: Editor | null, scope: EntityScope): Map<string, ResolvedMentionEntity> {
   const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -52,8 +57,8 @@ export function useResolvedMentions(editor: Editor | null, campaignId: string): 
   const key = useMemo(() => [...ids].sort().join(","), [ids]);
 
   const query = useQuery({
-    queryKey: ["campaigns", campaignId, "entities", "resolve", key],
-    queryFn: () => fetchResolved(campaignId, key.split(",").filter(Boolean)),
+    queryKey: [...resolveQueryKey(scope), "entities", "resolve", key],
+    queryFn: () => fetchResolved(scope, key.split(",").filter(Boolean)),
     enabled: key.length > 0,
   });
 

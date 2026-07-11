@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button, GenerationCandidateCard, Input, ModalChassis, Textarea } from "@/components/ui";
 import { useCreateEntity } from "@/hooks/useCreateEntity";
 import { useUpdateEntity } from "@/hooks/useUpdateEntity";
+import { campaignScope } from "@/hooks/useEntities";
 import { GenerateNpcsResponse, NpcCandidate, useGenerateNpcs } from "@/hooks/useGenerateNpcs";
 import { useNpcGenerationOptions } from "@/hooks/useNpcGenerationOptions";
 import { LabeledSelect } from "./LabeledSelect";
@@ -22,8 +23,9 @@ export interface NpcGenerationModalProps {
 export function NpcGenerationModal({ campaignId, onClose }: NpcGenerationModalProps) {
   const { data: options } = useNpcGenerationOptions();
   const generate = useGenerateNpcs();
-  const createEntity = useCreateEntity(campaignId, "npc");
-  const updateEntity = useUpdateEntity(campaignId, "npc");
+  const scope = campaignScope(campaignId);
+  const createEntity = useCreateEntity(scope, "npc");
+  const updateEntity = useUpdateEntity(scope, "npc");
   const router = useRouter();
 
   const [race, setRace] = useState<string | undefined>(undefined);

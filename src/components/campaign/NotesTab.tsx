@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { campaignScope } from "@/hooks/useEntities";
 import { useUpdateCampaignNotes } from "@/hooks/useUpdateCampaignNotes";
 
 /*
@@ -60,7 +61,7 @@ export function NotesTab({ campaignId, initialNotesJson }: NotesTabProps) {
       </p>
 
       <MentionEditor
-        campaignId={campaignId}
+        scope={campaignScope(campaignId)}
         value={initialNotesJson}
         onSave={handleSave}
         className="mt-sm"
