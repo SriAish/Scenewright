@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button, EmptyState, ModalChassis, PlusIcon } from "@/components/ui";
 import { Campaign, useCampaigns } from "@/hooks/useCampaigns";
 import { useDeleteCampaign } from "@/hooks/useDeleteCampaign";
@@ -18,7 +17,6 @@ export interface DashboardProps {
 
 /** Campaign dashboard, screen 2. */
 export function Dashboard({ userEmail, signOutAction }: DashboardProps) {
-  const router = useRouter();
   const { data: campaigns, isLoading } = useCampaigns();
   const updateCampaign = useUpdateCampaign();
   const deleteCampaign = useDeleteCampaign();
@@ -45,14 +43,9 @@ export function Dashboard({ userEmail, signOutAction }: DashboardProps) {
             heading="No campaigns yet"
             copy="Plan campaigns scene by scene."
             action={
-              <div className="flex items-center gap-sm">
-                <Button variant="primary" onClick={() => setNewCampaignOpen(true)}>
-                  Start blank campaign
-                </Button>
-                <Button variant="secondary" onClick={() => router.push("/directory")}>
-                  Browse adventure directory
-                </Button>
-              </div>
+              <Button variant="primary" onClick={() => setNewCampaignOpen(true)}>
+                Start blank campaign
+              </Button>
             }
           />
         </div>

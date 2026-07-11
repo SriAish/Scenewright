@@ -11,7 +11,7 @@ export interface TopBarProps {
   libraryActive?: boolean;
 }
 
-/** App-level top bar, shared by the dashboard, library, and directory screens. */
+/** App-level top bar, shared by the dashboard and library screens. */
 export function TopBar({ userEmail, signOutAction, libraryActive = false }: TopBarProps) {
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);

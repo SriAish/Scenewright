@@ -19,15 +19,16 @@ Primary handoff: Claude Design MCP server, connected when build steps run. Fallb
 
 Designed with all states: scene editor (@ dropdown, chip popover, sidebar states, empty state), campaign shell + scenes list (5), graph view (6), dashboard (2), notes tab (14), entity detail with NPC, monster, and item variants (9), entity tab (8, Characters frame; Monsters and Items share the layout), library (13), monster/item finder (11, monster + item + empty), NPC generation modal (10), import modal (12, including lineage grouping and the flatten/copy confirm step), new campaign modal (3, blank + adventure-prefilled).
 
-Not designed, to be derived from the design system: sign-in (1), adventure directory (4), attribution page (16), PDF export modal (15).
+Not designed, to be derived from the design system: sign-in (1), attribution page (16), PDF export modal (15).
 
 ## Performance configuration (decided)
 
-Vercel function region co-located with the Supabase project region. Pooled (transaction-mode) connection string, never the direct one. Module-scope caching for the embedding pipeline and DB client. React Query with optimistic updates on status flips, link edits, and entity saves. Dynamic imports for Tiptap and React Flow. Static rendering for the adventure directory and attribution pages.
+Vercel function region co-located with the Supabase project region. Pooled (transaction-mode) connection string, never the direct one. Module-scope caching for the embedding pipeline and DB client. React Query with optimistic updates on status flips, link edits, and entity saves. Dynamic imports for Tiptap and React Flow.
 
 ## Pending items
 
 - Verify fantasy-content-generator's license before embedding it. If porting mjmcphee's MIT tables instead, keep its copyright notice at the top of the ported file. Resolve before the NPC generation step.
+- Dev-mode overlapping PATCH no-response, root-caused to auth proxy concurrency; re-test on Vercel after deploy.
 
 ## Standing rules for all build work
 

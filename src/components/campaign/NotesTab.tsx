@@ -7,8 +7,7 @@ import { useUpdateCampaignNotes } from "@/hooks/useUpdateCampaignNotes";
 
 /*
   Dynamically imported so Tiptap only loads for the Notes tab, per
-  architecture.md's performance configuration. Same pattern as
-  /editor-preview.
+  architecture.md's performance configuration.
 */
 const MentionEditor = dynamic(() => import("@/components/editor/MentionEditor").then((mod) => mod.MentionEditor), {
   ssr: false,

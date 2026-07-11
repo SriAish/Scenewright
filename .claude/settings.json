@@ -137,7 +137,21 @@
       "Bash(node verify-backstory-mentions.mjs)",
       "Bash(grep -o \"Mention an entity.\\\\{0,600\\\\}\" /tmp/debug-page.html)",
       "Bash(sed -i '' 's/page.on\\(\"pageerror\", \\(err\\) => console.log\\(\"\\\\[pageerror\\\\]\", err.message\\)\\);/page.on\\(\"pageerror\", \\(err\\) => console.log\\(\"[pageerror]\", err.message\\)\\);\\\\npage.on\\(\"request\", \\(req\\) => { if \\(req.url\\(\\).includes\\(\"\\\\/entities\\\\/search\"\\)\\) console.log\\(\"[request]\", req.url\\(\\)\\); }\\);/' debug-backstory.mjs)",
-      "Bash(node debug-backstory.mjs)"
+      "Bash(node debug-backstory.mjs)",
+      "Bash(mv 0002_drop_adventure_directory.sql 20260711090000_drop_adventure_directory.sql)",
+      "Bash(mv meta/0002_snapshot.json meta/20260711090000_snapshot.json)",
+      "Bash(grep -rn \"inline$\\\\|inline \\\\|inline>\\\\|inline=\" /Users/aish/Documents/Scenewright/src --include=\"*.tsx\")",
+      "Bash(echo \"done, exit code $?\")",
+      "Bash(npx next *)",
+      "Bash(echo \"started, pid $!\")",
+      "Bash(curl -s -o /dev/null -w \"directory: %{http_code}\\\\n\" http://localhost:3911/directory)",
+      "Bash(curl -s -o /dev/null -w \"design-preview: %{http_code}\\\\n\" http://localhost:3911/design-preview)",
+      "Bash(curl -s -o /dev/null -w \"editor-preview: %{http_code}\\\\n\" http://localhost:3911/editor-preview)",
+      "Bash(kill %1)",
+      "Bash(curl -s -D - -o /dev/null http://localhost:3911/directory)",
+      "Bash(curl -s -o /dev/null -w \"library: %{http_code}\\\\n\" http://localhost:3911/library)",
+      "Bash(curl -s -o /dev/null -w \"attribution: %{http_code}\\\\n\" http://localhost:3911/attribution)",
+      "Bash(pkill -f \"next start -p 3911\")"
     ],
     "additionalDirectories": [
       "/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes",

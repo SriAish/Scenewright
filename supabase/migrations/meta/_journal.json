@@ -15,6 +15,13 @@
       "when": 1783736306604,
       "tag": "20260710120000_scene_entities",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1783780455561,
+      "tag": "20260711090000_drop_adventure_directory",
+      "breakpoints": true
     }
   ]
 }

@@ -10,6 +10,7 @@ import { ScenesTab } from "@/components/scenes/ScenesTab";
 import { EntityTab } from "@/components/entities/EntityTab";
 import { CampaignHeader } from "./CampaignHeader";
 import { CampaignTab, CampaignTabBar } from "./CampaignTabBar";
+import { ExportPdfModal } from "./ExportPdfModal";
 import { NotesTab } from "./NotesTab";
 
 export interface CampaignShellProps {
@@ -39,6 +40,7 @@ export function CampaignShell({ campaignId, initialTitle, initialStatus, initial
   // doesn't sync back to the URL, matching the other tabs.
   const [tab, setTab] = useState<CampaignTab>(searchParams.get("tab") === "notes" ? "notes" : "scenes");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [exportModalOpen, setExportModalOpen] = useState(false);
 
   function handleTitleChange(next: string) {
     const previous = title;
@@ -60,6 +62,7 @@ export function CampaignShell({ campaignId, initialTitle, initialStatus, initial
         onTitleChange={handleTitleChange}
         onStatusChange={handleStatusChange}
         onRequestDelete={() => setDeleteModalOpen(true)}
+        onRequestExport={() => setExportModalOpen(true)}
       />
       <CampaignTabBar active={tab} onChange={setTab} />
 
@@ -98,6 +101,10 @@ export function CampaignShell({ campaignId, initialTitle, initialStatus, initial
             stays recoverable and is not permanently removed.
           </p>
         </ModalChassis>
+      )}
+
+      {exportModalOpen && (
+        <ExportPdfModal campaignId={campaignId} onClose={() => setExportModalOpen(false)} />
       )}
     </div>
   );

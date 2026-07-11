@@ -17,12 +17,13 @@ export interface CampaignHeaderProps {
   onTitleChange: (title: string) => void;
   onStatusChange: (status: CampaignStatus) => void;
   onRequestDelete: () => void;
+  onRequestExport: () => void;
 }
 
 /**
  * Campaign shell header, screen 5: inline-editable title, a status
  * pill that opens a change-status menu (matches the frame's chevron
- * affordance), a disabled Export PDF button, and an overflow menu.
+ * affordance), an Export PDF button, and an overflow menu.
  */
 export function CampaignHeader({
   title,
@@ -30,6 +31,7 @@ export function CampaignHeader({
   onTitleChange,
   onStatusChange,
   onRequestDelete,
+  onRequestExport,
 }: CampaignHeaderProps) {
   const [isEditingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState(title);
@@ -124,8 +126,7 @@ export function CampaignHeader({
 
       <div className="flex-1" />
 
-      {/* Temporary: PDF export is a later build step, per build-brief.md's build order. */}
-      <Button variant="secondary" disabled title="Coming soon">
+      <Button variant="secondary" onClick={onRequestExport}>
         Export PDF
       </Button>
 

@@ -32,7 +32,7 @@
 
 ## Components
 
-- **Web client (Next.js pages, RSC defaults):** dashboard, campaign view (tabs: scenes, characters, items, monsters, notes), scene editor, graph view, registry browser, library, adventure directory. Tiptap and React Flow are dynamically imported so only their routes pay the bundle cost. Directory and attribution pages are statically rendered.
+- **Web client (Next.js pages, RSC defaults):** dashboard, campaign view (tabs: scenes, characters, items, monsters, notes), scene editor, graph view, registry browser, library. Tiptap and React Flow are dynamically imported so only their routes pay the bundle cost. Directory and attribution pages are statically rendered.
 - **API layer (route handlers):** auth-gated CRUD plus the services below. All business logic server-side.
 - **Mention/reverse-lookup service:** on save of any mention-enabled doc, walks Tiptap JSON, extracts mention nodes, replaces that document's mention rows in the same transaction as the doc write.
 - **Search service:** structured filters as SQL WHERE, then embed prose query via module-scope-cached transformers.js, then rank survivors by cosine similarity in pgvector, then top 3.
@@ -127,7 +127,6 @@ The straightforward set, all free-tier:
 - **Module-scope caching:** embedding pipeline and DB client held in module-level variables, lazily initialized, reused across warm invocations (Fluid compute keeps instances alive on Hobby tier).
 - React Query/SWR with optimistic updates on status flips, link edits, and entity saves; debounced autocomplete.
 - Dynamic imports for Tiptap and React Flow.
-- Static/ISR rendering for adventure directory and attribution pages; RSC defaults elsewhere.
 - **Deferred optimizations, revisit only if felt:** client-direct Supabase reads for autocomplete (adds a second data-access pattern, makes RLS load-bearing for logic); deliberate RSC fetch architecture beyond defaults; moving to a small always-on server (Fly/Railway) if cold starts still annoy, which would also allow a permanently-resident embedding model.
 
 ## Cross-cutting concerns

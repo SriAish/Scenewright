@@ -10,12 +10,6 @@ export interface ModalChassisProps {
   onClose: () => void;
   footer?: ReactNode;
   children: ReactNode;
-  /**
-   * Renders with `absolute` instead of `fixed` positioning so multiple
-   * states can be shown side by side on the /design-preview page. Real
-   * screens should omit this and let the chassis cover the viewport.
-   */
-  inline?: boolean;
 }
 
 /**
@@ -26,9 +20,9 @@ export interface ModalChassisProps {
  * carries no width override and falls back to the default 620px, unlike
  * NPC generation which sets width:860px explicitly.
  */
-export function ModalChassis({ title, size, onClose, footer, children, inline = false }: ModalChassisProps) {
+export function ModalChassis({ title, size, onClose, footer, children }: ModalChassisProps) {
   return (
-    <div className={`${inline ? "absolute" : "fixed"} inset-0 z-50 flex items-center justify-center`}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
         className="absolute inset-0 bg-modal-scrim backdrop-blur-[3px]"
         onClick={onClose}

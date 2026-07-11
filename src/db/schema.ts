@@ -199,14 +199,3 @@ export const mentions = pgTable(
     index("mentions_entity_id_idx").on(table.entityId),
   ],
 );
-
-export const adventureDirectory = pgTable("adventure_directory", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  title: text("title").notNull(),
-  publisher: text("publisher").notNull(),
-  url: text("url").notNull(),
-  description: text("description").notNull(),
-  tags: text("tags").array().notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});

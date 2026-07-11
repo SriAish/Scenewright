@@ -4,7 +4,6 @@
 2. Dashboard listing all campaigns, filterable by GM-set status: draft / running / completed.
 ### Campaign creation (pipeline step 1)
 1. V1: blank campaign with title and premise/storyline field.
-2. Curated link directory of free published adventures with a "start campaign from this" flow; GM reads the source themselves and builds structure in-app. The app never ships, stores, or redistributes adventure text.
 3. Deferred: structural templates (genre skeletons pre-seeding a scene graph with placeholder scenes, guidance text, and links).
 ### Scene system
 1. Suggested pipeline (storyline &rarr; start/end scenes &rarr; middle scenes &rarr; per-scene detail), never enforced; any order, any completeness.
@@ -63,7 +62,6 @@ Mention-enabled fields: scene narration (including start/end), NPC backstories, 
 11. Both NPC generation backends emit one normalized schema so picker, editing, and storage are backend-agnostic. No quota tracking for the free tier; attempt the call, catch failure.
 ### Licensing and third parties 
 1. Monster/item source lists are SRD only (CC-licensed); published books are copyrighted and out; non-SRD official content is GM-entered manually. Seed from open datasets (Open5e / 5e SRD JSON); CC-BY attribution statement for SRD 5.1/5.2 must appear visibly in the app. 
-2. Adventures are not in the SRD; free WotC adventures are free to read, not to redistribute; hence the link directory instead of shipping content. GM-pasted notes are private note-taking. 
 3. npcgenerator.com is not callable; no reliable free hosted NPC API exists; open-source table libraries are embedded rather than calling third parties. No canonical NPC list exists, so NPCs are generated, never retrieved. 
 4. Self-hosted open LLMs rejected (GPU cost, weak CPU models, impractical browser models); if LLM generation lands, it's free-tier hosted inference (e.g. Groq, Gemini free tier). 
 5. No free callable map-generation API exists; Watabou maps are free even commercially, attribution optional. 
