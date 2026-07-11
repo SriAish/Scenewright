@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, ModalChassis } from "@/components/ui";
+import { Button, ChevronDownIcon, ModalChassis } from "@/components/ui";
 import { useExportCampaignPdf } from "@/hooks/useExportCampaignPdf";
 
 export interface ExportPdfModalProps {
@@ -39,12 +39,17 @@ function downloadBlob(blob: Blob, filename: string) {
 export function ExportPdfModal({ campaignId, onClose }: ExportPdfModalProps) {
   const exportPdf = useExportCampaignPdf();
   const [downloaded, setDownloaded] = useState(false);
+  const [warnings, setWarnings] = useState<string[]>([]);
+  const [warningsExpanded, setWarningsExpanded] = useState(false);
 
   async function handleExport() {
     setDownloaded(false);
-    const { blob, filename } = await exportPdf.mutateAsync({ campaignId });
+    setWarnings([]);
+    setWarningsExpanded(false);
+    const { blob, filename, warnings: nextWarnings } = await exportPdf.mutateAsync({ campaignId });
     downloadBlob(blob, filename);
     setDownloaded(true);
+    setWarnings(nextWarnings);
   }
 
   return (
@@ -85,7 +90,34 @@ export function ExportPdfModal({ campaignId, onClose }: ExportPdfModalProps) {
           </p>
         )}
         {downloaded && !exportPdf.isPending && !exportPdf.isError && (
-          <p className="text-ui text-text-secondary">Downloaded.</p>
+          warnings.length === 0 ? (
+            <p className="text-ui text-text-secondary">Downloaded.</p>
+          ) : (
+            <div>
+              <p className="text-ui text-text-secondary">Downloaded.</p>
+              <button
+                type="button"
+                onClick={() => setWarningsExpanded((open) => !open)}
+                className="w-full flex items-center justify-between cursor-pointer mt-sm"
+              >
+                <span className="text-micro text-text-secondary">
+                  Exported with {warnings.length} note{warnings.length === 1 ? "" : "s"}
+                </span>
+                <ChevronDownIcon
+                  className={`text-text-placeholder transition-transform duration-150 ${warningsExpanded ? "rotate-180" : "-rotate-90"}`}
+                />
+              </button>
+              {warningsExpanded && (
+                <ul className="flex flex-col gap-[4px] mt-sm">
+                  {warnings.map((warning, index) => (
+                    <li key={index} className="text-micro text-text-secondary leading-[1.4] pl-md relative before:content-['•'] before:absolute before:left-0 before:text-text-placeholder">
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )
         )}
       </div>
     </ModalChassis>
