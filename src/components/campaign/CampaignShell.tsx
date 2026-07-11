@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button, EntityType, ModalChassis } from "@/components/ui";
 import { CampaignStatus } from "@/hooks/useCampaigns";
 import { useDeleteCampaign } from "@/hooks/useDeleteCampaign";
@@ -10,12 +10,13 @@ import { ScenesTab } from "@/components/scenes/ScenesTab";
 import { EntityTab } from "@/components/entities/EntityTab";
 import { CampaignHeader } from "./CampaignHeader";
 import { CampaignTab, CampaignTabBar } from "./CampaignTabBar";
-import { TabPlaceholder } from "./TabPlaceholder";
+import { NotesTab } from "./NotesTab";
 
 export interface CampaignShellProps {
   campaignId: string;
   initialTitle: string;
   initialStatus: CampaignStatus;
+  initialNotesJson: unknown;
 }
 
 const ENTITY_TAB_TYPE: Record<"characters" | "monsters" | "items", EntityType> = {
@@ -25,14 +26,18 @@ const ENTITY_TAB_TYPE: Record<"characters" | "monsters" | "items", EntityType> =
 };
 
 /** Campaign view shell, screen 5: header, tab bar, and the active tab. Replaces the /campaigns/[id] placeholder. */
-export function CampaignShell({ campaignId, initialTitle, initialStatus }: CampaignShellProps) {
+export function CampaignShell({ campaignId, initialTitle, initialStatus, initialNotesJson }: CampaignShellProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const updateCampaign = useUpdateCampaign();
   const deleteCampaign = useDeleteCampaign();
 
   const [title, setTitle] = useState(initialTitle);
   const [status, setStatus] = useState<CampaignStatus>(initialStatus);
-  const [tab, setTab] = useState<CampaignTab>("scenes");
+  // Read once on mount so links like the entity detail "Appears in" panel
+  // can deep-link into the Notes tab via ?tab=notes; the tab bar itself
+  // doesn't sync back to the URL, matching the other tabs.
+  const [tab, setTab] = useState<CampaignTab>(searchParams.get("tab") === "notes" ? "notes" : "scenes");
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
   function handleTitleChange(next: string) {
@@ -61,7 +66,7 @@ export function CampaignShell({ campaignId, initialTitle, initialStatus }: Campa
       {tab === "scenes" ? (
         <ScenesTab campaignId={campaignId} />
       ) : tab === "notes" ? (
-        <TabPlaceholder label="Notes" />
+        <NotesTab campaignId={campaignId} initialNotesJson={initialNotesJson} />
       ) : (
         <EntityTab campaignId={campaignId} type={ENTITY_TAB_TYPE[tab]} />
       )}

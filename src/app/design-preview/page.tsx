@@ -125,13 +125,13 @@ export default function DesignPreviewPage() {
             </MentionChip>
           ))}
         </StateRow>
-        <StateRow label="Auto-populated (dotted border)">
-          <MentionChip type="npc" autoPopulated>
+        <StateRow label="Auto-populated from a mention (solid, no border)">
+          <MentionChip type="npc">Example NPC</MentionChip>
+        </StateRow>
+        <StateRow label="Manually added (dashed border)">
+          <MentionChip type="npc" manual>
             Example NPC
           </MentionChip>
-        </StateRow>
-        <StateRow label="Manually added (no border)">
-          <MentionChip type="npc">Example NPC</MentionChip>
         </StateRow>
       </Section>
 

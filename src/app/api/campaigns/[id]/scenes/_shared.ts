@@ -20,6 +20,11 @@ export const updateSceneSchema = z
     // Graph view node position; null means "not placed yet, auto-layout on next graph open".
     graphX: z.number().nullable().optional(),
     graphY: z.number().nullable().optional(),
+    // Storage path in the scene-maps bucket; null clears the map. Set by
+    // the client after a direct upload to a signed URL this campaign's
+    // map-upload-url route issued.
+    mapImagePath: z.string().nullable().optional(),
+    mapSourceUrl: z.string().trim().nullable().optional(),
   })
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: "At least one field is required",

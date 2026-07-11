@@ -58,9 +58,23 @@ export const Mention = TiptapMention.extend<MentionOptions<MentionSearchResult, 
 });
 
 function insertMention(editor: Editor, range: Range, id: string, entityType: MentionEntityType) {
+  // For the "create new entity" path, this runs after an await (the
+  // create-entity fetch in buildMentionSuggestion's command below). If the
+  // doc changed size in the meantime (the user kept typing while the
+  // request was in flight), the range captured at trigger time can point
+  // past the current document, and insertContentAt throws a RangeError,
+  // crashing the editor and leaving the literal "@query" text stranded.
+  // Clamp to the current doc bounds so a stale range degrades to
+  // "insert at the nearest valid position" instead of crashing.
+  const docSize = editor.state.doc.content.size;
+  const safeRange =
+    range.from <= docSize && range.to <= docSize
+      ? range
+      : { from: Math.min(editor.state.selection.from, docSize), to: Math.min(editor.state.selection.from, docSize) };
+
   const nodeAfter = editor.view.state.selection.$to.nodeAfter;
   const overrideSpace = nodeAfter?.text?.startsWith(" ");
-  const finalRange = overrideSpace ? { ...range, to: range.to + 1 } : range;
+  const finalRange = overrideSpace ? { ...safeRange, to: Math.min(safeRange.to + 1, docSize) } : safeRange;
 
   editor
     .chain()

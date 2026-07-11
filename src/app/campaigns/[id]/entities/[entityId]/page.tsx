@@ -64,9 +64,6 @@ export default async function EntityPage({
   const sceneNameById = new Map(sceneNames.map((row) => [row.id, row.name]));
   const backstoryNameById = new Map(backstoryEntityNames.map((row) => [row.id, row.name]));
 
-  // campaign_notes mentions can exist in mentions rows in principle, but
-  // nothing writes them yet (the notes tab is a later build step per
-  // build-brief.md); skip rows this page can't yet resolve to a link.
   const appearsIn: AppearsInRow[] = mentionRows.flatMap((row) => {
     if (row.sourceType === "scene") {
       const name = sceneNameById.get(row.sourceId);
@@ -77,6 +74,9 @@ export default async function EntityPage({
       const name = backstoryNameById.get(row.sourceId);
       if (!name) return [];
       return [{ label: `${name}'s backstory`, href: `/campaigns/${campaign.id}/entities/${row.sourceId}` }];
+    }
+    if (row.sourceType === "campaign_notes") {
+      return [{ label: "Campaign notes", href: `/campaigns/${campaign.id}?tab=notes` }];
     }
     return [];
   });

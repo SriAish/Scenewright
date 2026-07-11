@@ -18,7 +18,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
   const { id } = await params;
   const db = getDb();
   const [campaign] = await db
-    .select({ title: campaigns.title, status: campaigns.status })
+    .select({ title: campaigns.title, status: campaigns.status, notesJson: campaigns.notesJson })
     .from(campaigns)
     .where(and(eq(campaigns.id, id), eq(campaigns.userId, user.id), isNull(campaigns.deletedAt)));
 
@@ -31,6 +31,7 @@ export default async function CampaignPage({ params }: { params: Promise<{ id: s
       campaignId={id}
       initialTitle={campaign.title}
       initialStatus={campaign.status as "draft" | "running" | "completed"}
+      initialNotesJson={campaign.notesJson}
     />
   );
 }

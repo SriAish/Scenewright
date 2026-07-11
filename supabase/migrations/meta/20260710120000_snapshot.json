@@ -1,6 +1,6 @@
 {
-  "id": "8536367e-1002-4f2c-86f7-d94a504fe54e",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "cb6647a8-b230-40b0-a5fc-e264059102eb",
+  "prevId": "8536367e-1002-4f2c-86f7-d94a504fe54e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -426,6 +426,116 @@
           "value": "\"mentions\".\"source_type\" in ('scene', 'entity_backstory', 'campaign_notes')"
         }
       },
+      "isRLSEnabled": false
+    },
+    "public.scene_entities": {
+      "name": "scene_entities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "scene_id": {
+          "name": "scene_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entity_id": {
+          "name": "entity_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "scene_entities_scene_id_entity_id_idx": {
+          "name": "scene_entities_scene_id_entity_id_idx",
+          "columns": [
+            {
+              "expression": "scene_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entity_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "scene_entities_scene_id_idx": {
+          "name": "scene_entities_scene_id_idx",
+          "columns": [
+            {
+              "expression": "scene_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "scene_entities_scene_id_scenes_id_fk": {
+          "name": "scene_entities_scene_id_scenes_id_fk",
+          "tableFrom": "scene_entities",
+          "tableTo": "scenes",
+          "columnsFrom": [
+            "scene_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "scene_entities_entity_id_entities_id_fk": {
+          "name": "scene_entities_entity_id_entities_id_fk",
+          "tableFrom": "scene_entities",
+          "tableTo": "entities",
+          "columnsFrom": [
+            "entity_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
       "isRLSEnabled": false
     },
     "public.scene_links": {

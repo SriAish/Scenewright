@@ -125,6 +125,31 @@ export const entities = pgTable(
   ],
 );
 
+/*
+  Manual sidebar additions only. Mention-derived (auto) sidebar entries
+  are never written here; they're computed at read time from the
+  mentions table (source_type "scene"). See MentionChip's doc comment
+  for the auto/manual chip styling this backs.
+*/
+export const sceneEntities = pgTable(
+  "scene_entities",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sceneId: uuid("scene_id")
+      .notNull()
+      .references(() => scenes.id),
+    entityId: uuid("entity_id")
+      .notNull()
+      .references(() => entities.id),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("scene_entities_scene_id_entity_id_idx").on(table.sceneId, table.entityId),
+    index("scene_entities_scene_id_idx").on(table.sceneId),
+  ],
+);
+
 export const srdEntries = pgTable(
   "srd_entries",
   {

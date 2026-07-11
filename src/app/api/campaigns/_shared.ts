@@ -13,11 +13,11 @@ export const updateCampaignSchema = z
     title: z.string().trim().min(1, "Title is required").optional(),
     premise: z.string().trim().nullable().optional(),
     status: campaignStatusSchema.optional(),
+    notesJson: z.unknown().optional(),
   })
-  .refine(
-    (data) => data.title !== undefined || data.premise !== undefined || data.status !== undefined,
-    { message: "At least one field is required" },
-  );
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    message: "At least one field is required",
+  });
 
 export async function requireUser() {
   const supabase = await createClient();

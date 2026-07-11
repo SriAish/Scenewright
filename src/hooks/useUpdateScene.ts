@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { sceneQueryKey } from "./useScene";
 import { Scene, scenesQueryKey, SceneStatus } from "./useScenes";
 
 export interface UpdateSceneInput {
@@ -13,6 +14,8 @@ export interface UpdateSceneInput {
   sortIndex?: number;
   graphX?: number | null;
   graphY?: number | null;
+  mapImagePath?: string | null;
+  mapSourceUrl?: string | null;
 }
 
 async function updateScene(campaignId: string, { id, ...values }: UpdateSceneInput): Promise<Scene> {
@@ -58,8 +61,9 @@ export function useUpdateScene(campaignId: string) {
         queryClient.setQueryData(queryKey, context.previous);
       }
     },
-    onSettled: () => {
+    onSettled: (_data, _error, input) => {
       queryClient.invalidateQueries({ queryKey });
+      queryClient.invalidateQueries({ queryKey: sceneQueryKey(campaignId, input.id) });
     },
   });
 }

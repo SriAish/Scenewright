@@ -6,11 +6,16 @@ export interface MentionChipProps {
   /** Soft-deleted entity: mention renders as an inactive, greyed chip. */
   deleted?: boolean;
   /**
-   * Distinguishes sidebar chips auto-populated from mentions (dotted
-   * border) from ones added manually (no border). Filled-pill context
-   * only; not used for inline narration mentions.
+   * Distinguishes sidebar chips added manually (dashed border) from ones
+   * auto-populated from mentions (solid, no border). Confirmed against
+   * the Scene Editor Claude Design frame (states 1a/2b): the mentioned
+   * entities (Kaelen, Mira) render solid, and the one absent from the
+   * visible text (Old Fenwick) renders dashed and greyed. This supersedes
+   * screens.md's "auto gets the dotted border" prose, which describes the
+   * opposite mapping. Filled-pill context only; not used for inline
+   * narration mentions.
    */
-  autoPopulated?: boolean;
+  manual?: boolean;
   className?: string;
 }
 
@@ -22,14 +27,14 @@ export function MentionChip({
   type,
   children,
   deleted = false,
-  autoPopulated = false,
+  manual = false,
   className,
 }: MentionChipProps) {
   const palette = entityColorClasses[type];
   const colorClasses = deleted
     ? "bg-surface-panel text-text-placeholder"
     : `${palette.bg} ${palette.text}`;
-  const borderClasses = autoPopulated
+  const borderClasses = manual
     ? `border border-dashed ${deleted ? "border-border-soft" : "border-current"}`
     : "";
 

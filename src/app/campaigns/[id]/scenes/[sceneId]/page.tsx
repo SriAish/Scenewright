@@ -3,8 +3,14 @@ import { and, eq, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { campaigns, scenes } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
-import { SceneEditorTemp } from "./SceneEditorTemp";
+import { SceneEditor } from "@/components/scenes/SceneEditor";
 
+/*
+  Auth and existence/ownership check only, matching CampaignShell's
+  pattern: the client component owns its own data fetching (useScene)
+  so field-level autosave can invalidate and refetch without a full
+  page reload.
+*/
 export default async function ScenePage({
   params,
 }: {
@@ -31,27 +37,11 @@ export default async function ScenePage({
     notFound();
   }
 
-  const [scene] = await db
-    .select()
-    .from(scenes)
-    .where(and(eq(scenes.id, sceneId), eq(scenes.campaignId, id)));
+  const [scene] = await db.select({ id: scenes.id }).from(scenes).where(and(eq(scenes.id, sceneId), eq(scenes.campaignId, id)));
 
   if (!scene) {
     notFound();
   }
 
-  return (
-    <SceneEditorTemp
-      campaignId={campaign.id}
-      campaignTitle={campaign.title}
-      scene={{
-        id: scene.id,
-        name: scene.name,
-        status: scene.status as "not_run" | "running" | "completed" | "skipped",
-        startJson: scene.startJson,
-        narrationJson: scene.narrationJson,
-        endJson: scene.endJson,
-      }}
-    />
-  );
+  return <SceneEditor campaignId={campaign.id} campaignTitle={campaign.title} sceneId={scene.id} />;
 }

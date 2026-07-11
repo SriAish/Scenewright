@@ -110,11 +110,30 @@
       "Bash(node pw-verify7.mjs \"editor-preview-test-1783720355302@example.com\" bb6bf9f3-1829-41b3-b971-8e86a60a59a5 4c63432e-7d12-4665-8c2d-7d99ea6e7acb afce5014-7b8f-4915-8e47-a06a84a1edc8)",
       "Bash(node pw-verify8.mjs \"editor-preview-test-1783720355302@example.com\" bb6bf9f3-1829-41b3-b971-8e86a60a59a5 d5a6e3e2-439e-4e22-8ea2-12f447823c36 afce5014-7b8f-4915-8e47-a06a84a1edc8)",
       "Bash(node find-test-data.mjs)",
-      "Bash(node cleanup-test-data.mjs)"
+      "Bash(node cleanup-test-data.mjs)",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(lsof -ti:3000)",
+      "Bash(xargs kill -9)",
+      "Bash(echo \"TSC_EXIT=$?\")",
+      "Bash(rm /Users/aish/Documents/Scenewright/supabase/migrations/0001_add_scene_entities.sql /Users/aish/Documents/Scenewright/supabase/migrations/meta/0001_snapshot.json)",
+      "Bash(mv 0001_add_scene_entities.sql 20260710120000_scene_entities.sql)",
+      "Bash(mv meta/0001_snapshot.json meta/20260710120000_snapshot.json)",
+      "Bash(rm /Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes/[sceneId]/SceneEditorTemp.tsx *)",
+      "Bash(rm \"/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes/[sceneId]/SceneEditorTemp.tsx\" *)",
+      "Read(//Users/aish/.cache/**)",
+      "Bash(node -e \"console.log\\(require\\('playwright'\\).chromium\\)\")",
+      "Bash(curl -sf -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000)",
+      "Bash(ps -p 3913 -o pid,pcpu,etime,stat,command)",
+      "Bash(ps -p 3913 -o pid,etime,stat)",
+      "Bash(kill -QUIT 3913)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(pkill -f \"next dev\" 2>/dev/null *)"
     ],
     "additionalDirectories": [
       "/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes",
-      "/Users/aish/Documents/Scenewright/src/app/api/campaigns/[id]/entities"
+      "/Users/aish/Documents/Scenewright/src/app/api/campaigns/[id]/entities",
+      "/Users/aish/Documents/Scenewright/src/app/campaigns/[id]/scenes/[sceneId]",
+      "/tmp"
     ]
   }
 }
