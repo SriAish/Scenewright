@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { and, eq, or } from "drizzle-orm";
 import { getDb } from "@/db";
 import { scenes, sceneLinks } from "@/db/schema";
+import { rebuildMentions } from "@/lib/mentions";
 import { requireUser } from "../../../_shared";
 import { requireOwnedCampaign, updateSceneSchema } from "../_shared";
 
@@ -35,12 +36,47 @@ export async function PATCH(
   if (parsed.data.graphX !== undefined) values.graphX = parsed.data.graphX;
   if (parsed.data.graphY !== undefined) values.graphY = parsed.data.graphY;
 
+  // start_json, end_json, and narration_json share one mentions row-space
+  // (source_type "scene", source_id this scene's id), per architecture.md.
+  // A rebuild needs all three fields' current mentions, not just the one(s)
+  // touched by this PATCH, or it would wipe mentions from the untouched
+  // fields.
+  const touchesDoc =
+    parsed.data.startJson !== undefined ||
+    parsed.data.narrationJson !== undefined ||
+    parsed.data.endJson !== undefined;
+
   const db = getDb();
-  const [updated] = await db
-    .update(scenes)
-    .set(values)
-    .where(and(eq(scenes.id, sceneId), eq(scenes.campaignId, id)))
-    .returning();
+  const updated = await db.transaction(async (tx) => {
+    const [existing] = await tx
+      .select({ startJson: scenes.startJson, narrationJson: scenes.narrationJson, endJson: scenes.endJson })
+      .from(scenes)
+      .where(and(eq(scenes.id, sceneId), eq(scenes.campaignId, id)));
+    if (!existing) {
+      return null;
+    }
+
+    const [row] = await tx
+      .update(scenes)
+      .set(values)
+      .where(and(eq(scenes.id, sceneId), eq(scenes.campaignId, id)))
+      .returning();
+
+    if (touchesDoc) {
+      await rebuildMentions(tx, {
+        sourceType: "scene",
+        sourceId: sceneId,
+        campaignId: id,
+        docs: [
+          parsed.data.startJson ?? existing.startJson,
+          parsed.data.narrationJson ?? existing.narrationJson,
+          parsed.data.endJson ?? existing.endJson,
+        ],
+      });
+    }
+
+    return row;
+  });
 
   if (!updated) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

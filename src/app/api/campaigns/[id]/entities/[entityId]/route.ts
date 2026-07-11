@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { and, eq, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
 import { entities } from "@/db/schema";
+import { rebuildMentions } from "@/lib/mentions";
 import { requireUser } from "../../../_shared";
 import { entityDataSchemas, requireOwnedCampaign, updateEntitySchema } from "../_shared";
 
@@ -56,11 +57,24 @@ export async function PATCH(
     values.backstoryJson = parsed.data.backstoryJson;
   }
 
-  const [updated] = await db
-    .update(entities)
-    .set(values)
-    .where(and(eq(entities.id, entityId), eq(entities.campaignId, id)))
-    .returning();
+  const updated = await db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(entities)
+      .set(values)
+      .where(and(eq(entities.id, entityId), eq(entities.campaignId, id)))
+      .returning();
+
+    if (parsed.data.backstoryJson !== undefined) {
+      await rebuildMentions(tx, {
+        sourceType: "entity_backstory",
+        sourceId: entityId,
+        campaignId: id,
+        docs: [parsed.data.backstoryJson],
+      });
+    }
+
+    return row;
+  });
 
   return NextResponse.json(updated);
 }

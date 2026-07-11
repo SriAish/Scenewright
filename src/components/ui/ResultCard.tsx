@@ -29,10 +29,21 @@ export interface FinderResultCardProps {
   description: string;
   onAdd: () => void;
   addLabel?: string;
+  /** True once this result has been successfully added: replaces the button with a static confirmation, no re-add. */
+  added?: boolean;
+  adding?: boolean;
 }
 
 /** Monster/item finder result row: name, key-stats line, description, Add to campaign. */
-export function FinderResultCard({ name, keyStats, description, onAdd, addLabel = "Add to campaign" }: FinderResultCardProps) {
+export function FinderResultCard({
+  name,
+  keyStats,
+  description,
+  onAdd,
+  addLabel = "Add to campaign",
+  added = false,
+  adding = false,
+}: FinderResultCardProps) {
   return (
     <CandidateCardChassis layout="row">
       <div className="min-w-0 flex-1">
@@ -40,9 +51,13 @@ export function FinderResultCard({ name, keyStats, description, onAdd, addLabel 
         <div className="text-micro text-text-secondary mt-[2px]">{keyStats}</div>
         <div className="text-ui text-text-secondary mt-[4px] line-clamp-2">{description}</div>
       </div>
-      <Button variant="secondary" size="sm" onClick={onAdd} className="shrink-0">
-        {addLabel}
-      </Button>
+      {added ? (
+        <span className="shrink-0 text-ui font-medium text-accent px-sm">Added</span>
+      ) : (
+        <Button variant="secondary" size="sm" onClick={onAdd} disabled={adding} className="shrink-0">
+          {adding ? "Adding..." : addLabel}
+        </Button>
+      )}
     </CandidateCardChassis>
   );
 }
@@ -76,7 +91,7 @@ export function GenerationCandidateCard({
     <CandidateCardChassis layout="column">
       <div className="text-content font-semibold text-text-primary">{name}</div>
       <div className="text-ui text-text-secondary line-clamp-2">{descriptionExcerpt}</div>
-      <div className="text-micro text-text-secondary">{personalityTraits}</div>
+      <div className="text-micro text-text-secondary whitespace-pre-line">{personalityTraits}</div>
       <div className="flex gap-sm">
         {abilityScores.map((score) => (
           <div key={score.label} className="flex flex-col items-center flex-1 bg-surface-card rounded-sm py-[4px]">

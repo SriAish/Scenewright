@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Button, EmptyState, EntityCard, EntityType, PlusIcon } from "@/components/ui";
 import { useCreateEntity } from "@/hooks/useCreateEntity";
 import { useEntities } from "@/hooks/useEntities";
+import { FinderModal } from "./finder/FinderModal";
+import { NpcGenerationModal } from "./generation/NpcGenerationModal";
 import { NewEntityModal } from "./NewEntityModal";
 
 const TAB_META: Record<EntityType, { searchPlaceholder: string; singular: string; emptyHeading: string }> = {
@@ -21,17 +23,22 @@ export interface EntityTabProps {
 /**
  * Entity tab, screen 8: shared layout for Characters, Monsters, and
  * Items. Search filters client-side over the already-fetched list, by
- * name and summary. Generate and Import are disabled placeholders,
- * later build steps per build-brief.md's build order.
+ * name and summary. Import stays a disabled placeholder (step 14).
+ * Generate applies only to NPCs (per features-and-decisions.md,
+ * monsters/items are retrieved, never generated); Monsters and Items
+ * show "Find" in that same toolbar slot instead, opening the SRD finder.
  */
 export function EntityTab({ campaignId, type }: EntityTabProps) {
   const router = useRouter();
   const meta = TAB_META[type];
   const { data: entities, isLoading } = useEntities(campaignId, type);
   const createEntity = useCreateEntity(campaignId, type);
+  const isSrdType = type === "monster" || type === "item";
 
   const [search, setSearch] = useState("");
   const [newEntityOpen, setNewEntityOpen] = useState(false);
+  const [finderOpen, setFinderOpen] = useState(false);
+  const [generationOpen, setGenerationOpen] = useState(false);
 
   const filtered = useMemo(() => {
     if (!entities) return [];
@@ -63,9 +70,15 @@ export function EntityTab({ campaignId, type }: EntityTabProps) {
         <Button variant="secondary" disabled title="Coming soon">
           Import
         </Button>
-        <Button variant="secondary" disabled title="Coming soon">
-          Generate
-        </Button>
+        {isSrdType ? (
+          <Button variant="secondary" onClick={() => setFinderOpen(true)}>
+            Find
+          </Button>
+        ) : (
+          <Button variant="secondary" onClick={() => setGenerationOpen(true)}>
+            Generate
+          </Button>
+        )}
         <Button variant="primary" onClick={() => setNewEntityOpen(true)}>
           <PlusIcon />
           New {meta.singular}
@@ -83,9 +96,15 @@ export function EntityTab({ campaignId, type }: EntityTabProps) {
                   <PlusIcon />
                   New {meta.singular}
                 </Button>
-                <Button variant="secondary" disabled title="Coming soon">
-                  Generate
-                </Button>
+                {isSrdType ? (
+                  <Button variant="secondary" onClick={() => setFinderOpen(true)}>
+                    Find
+                  </Button>
+                ) : (
+                  <Button variant="secondary" onClick={() => setGenerationOpen(true)}>
+                    Generate
+                  </Button>
+                )}
               </div>
             }
           />
@@ -110,6 +129,12 @@ export function EntityTab({ campaignId, type }: EntityTabProps) {
       )}
 
       {newEntityOpen && <NewEntityModal type={type} onClose={() => setNewEntityOpen(false)} onCreate={handleCreate} />}
+      {finderOpen && (type === "monster" || type === "item") && (
+        <FinderModal campaignId={campaignId} type={type} onClose={() => setFinderOpen(false)} />
+      )}
+      {generationOpen && type === "npc" && (
+        <NpcGenerationModal campaignId={campaignId} onClose={() => setGenerationOpen(false)} />
+      )}
     </div>
   );
 }

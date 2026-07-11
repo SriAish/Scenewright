@@ -21,7 +21,10 @@ export interface ModalChassisProps {
 /**
  * Modal shell: dimmed/blurred backdrop, header (italic display title +
  * close button), scrollable body, optional footer. Two size variants:
- * small (new campaign) and two-panel (finder, NPC generation).
+ * small, 620px (new campaign, monster/item finder) and two-panel, 860px
+ * (NPC generation). Per the source frames: the finder's modal-dialog
+ * carries no width override and falls back to the default 620px, unlike
+ * NPC generation which sets width:860px explicitly.
  */
 export function ModalChassis({ title, size, onClose, footer, children, inline = false }: ModalChassisProps) {
   return (

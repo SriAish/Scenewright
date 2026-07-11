@@ -8,6 +8,7 @@ import {
   Button,
   EntityType,
   IconButton,
+  MapIcon,
   MentionChip,
   ModalChassis,
   MoreIcon,
@@ -24,6 +25,11 @@ import { NpcFields } from "./NpcFields";
 const TAB_LABEL: Record<EntityType, string> = { npc: "Characters", monster: "Monsters", item: "Items" };
 const TYPE_CHIP_LABEL: Record<EntityType, string> = { npc: "Character", monster: "Monster", item: "Item" };
 
+export interface AppearsInRow {
+  label: string;
+  href: string;
+}
+
 export interface EntityDetailProps {
   campaignId: string;
   campaignTitle: string;
@@ -35,6 +41,10 @@ export interface EntityDetailProps {
     data: NpcData | MonsterData | ItemData;
     backstoryJson: unknown;
   };
+  /** Name of the srd_entries row this entity was forked from, or null when it wasn't SRD-derived. */
+  srdSourceName?: string | null;
+  /** Scenes and backstories mentioning this entity, from the mentions reverse-lookup. */
+  appearsIn?: AppearsInRow[];
 }
 
 interface BackstoryState {
@@ -53,7 +63,7 @@ function initBackstory(doc: unknown): BackstoryState {
  * import, no finder, no library, no mentions, no save-to-library in
  * this build step.
  */
-export function EntityDetail({ campaignId, campaignTitle, entity }: EntityDetailProps) {
+export function EntityDetail({ campaignId, campaignTitle, entity, srdSourceName, appearsIn = [] }: EntityDetailProps) {
   const router = useRouter();
   const updateEntity = useUpdateEntity(campaignId, entity.type);
   const deleteEntity = useDeleteEntity(campaignId, entity.type);
@@ -193,9 +203,28 @@ export function EntityDetail({ campaignId, campaignTitle, entity }: EntityDetail
           <span className="block text-label font-semibold uppercase tracking-wider text-text-label">
             Appears in
           </span>
-          <div className="bg-surface-card border border-border-soft rounded-lg p-md">
-            <p className="text-ui text-text-secondary leading-[1.5]">Nothing mentions this yet.</p>
+          <div className="bg-surface-card border border-border-soft rounded-lg p-md flex flex-col gap-sm">
+            {appearsIn.length === 0 ? (
+              <p className="text-ui text-text-secondary leading-[1.5]">Nothing mentions this yet.</p>
+            ) : (
+              appearsIn.map((row) => (
+                <Link
+                  key={`${row.href}-${row.label}`}
+                  href={row.href}
+                  className="text-ui text-link hover:text-link-hover leading-[1.4]"
+                >
+                  {row.label}
+                </Link>
+              ))
+            )}
           </div>
+
+          {srdSourceName && (
+            <div className="flex items-center gap-sm text-micro text-text-placeholder">
+              <MapIcon size={12} />
+              Based on SRD: {srdSourceName}
+            </div>
+          )}
 
           <div className="flex items-center gap-sm relative" ref={overflowRef}>
             <div className="flex-1" />
