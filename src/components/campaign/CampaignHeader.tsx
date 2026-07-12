@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button, ChevronDownIcon, IconButton, MoreIcon, StatusPill } from "@/components/ui";
+import Link from "next/link";
+import { BackIcon, Button, ChevronDownIcon, IconButton, MoreIcon, StatusPill } from "@/components/ui";
 import { CampaignStatus } from "@/hooks/useCampaigns";
 
 const STATUS_LABEL: Record<CampaignStatus, string> = {
@@ -21,9 +22,12 @@ export interface CampaignHeaderProps {
 }
 
 /**
- * Campaign shell header, screen 5: inline-editable title, a status
- * pill that opens a change-status menu (matches the frame's chevron
- * affordance), an Export PDF button, and an overflow menu.
+ * Campaign shell header, screen 5: a back-to-dashboard link (screens.md
+ * gives campaign routes no path back to the dashboard; this closes that
+ * gap, matching the scene editor's own back link), inline-editable
+ * title, a status pill that opens a change-status menu (matches the
+ * frame's chevron affordance), an Export PDF button, and an overflow
+ * menu.
  */
 export function CampaignHeader({
   title,
@@ -68,6 +72,16 @@ export function CampaignHeader({
 
   return (
     <div className="flex items-center gap-md px-xl py-base border-b border-border-default bg-surface-card-solid sticky top-0 z-20">
+      <Link
+        href="/"
+        className="inline-flex items-center gap-sm text-ui font-medium text-text-secondary hover:bg-surface-panel rounded-sm px-sm py-[6px]"
+      >
+        <BackIcon />
+        Your campaigns
+      </Link>
+
+      <div className="w-px h-[22px] bg-border-default" />
+
       {isEditingTitle ? (
         <input
           autoFocus
