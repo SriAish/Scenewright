@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { getDb } from "@/db";
-import { entities, mentions, scenes } from "@/db/schema";
+import { entities, mentions, scenes, srdEntries } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { EntityDetail, type AppearsInRow } from "@/components/entities/EntityDetail";
 import { ItemData, MonsterData, NpcData } from "@/hooks/useEntities";
@@ -9,12 +9,14 @@ import { ItemData, MonsterData, NpcData } from "@/hooks/useEntities";
 /*
   Library entity detail: same EntityDetail component as a campaign
   entity, scoped to campaign_id IS NULL instead of an owned campaign.
-  Never SRD-derived, and never itself the target of Save-to-library (an
-  entity already in the library can't be saved to the library), so
-  srdSourceName/copiedFrom/canSaveToLibrary are always empty/false here
-  regardless of whether this row was itself forked from a campaign
-  entity (that provenance is surfaced on the library card grid instead,
-  per screen 13's "Saved from [campaign]" line).
+  Never itself the target of Save-to-library (an entity already in the
+  library can't be saved to the library), so copiedFrom/canSaveToLibrary
+  are always empty/false here (fork-from-campaign provenance is
+  surfaced on the library card grid instead, per screen 13's "Saved
+  from [campaign]" line). It can be SRD-derived, though, via the
+  library's SRD source view's "Add to library"; srdSourceName is looked
+  up from srd_source_id when set, same provenance rule as a campaign
+  entity's SRD-derived detail.
 */
 export default async function LibraryEntityPage({
   params,
@@ -42,6 +44,12 @@ export default async function LibraryEntityPage({
     notFound();
   }
   const { entity } = row;
+
+  let srdSourceName: string | null = null;
+  if (entity.srdSourceId) {
+    const [srdEntry] = await db.select({ name: srdEntries.name }).from(srdEntries).where(eq(srdEntries.id, entity.srdSourceId));
+    srdSourceName = srdEntry?.name ?? null;
+  }
 
   const mentionRows = await db
     .select({ sourceType: mentions.sourceType, sourceId: mentions.sourceId })
@@ -93,7 +101,7 @@ export default async function LibraryEntityPage({
         data: entity.data as NpcData | MonsterData | ItemData,
         backstoryJson: entity.backstoryJson,
       }}
-      srdSourceName={null}
+      srdSourceName={srdSourceName}
       copiedFrom={null}
       canSaveToLibrary={false}
       appearsIn={appearsIn}

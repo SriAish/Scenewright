@@ -32,9 +32,12 @@ export function TopBar({ userEmail, signOutAction, libraryActive = false }: TopB
 
   return (
     <div className="flex items-center gap-md px-xl py-base border-b border-border-default bg-surface-card-solid sticky top-0 z-20">
-      <span className="font-display italic font-semibold text-display text-text-primary">
+      <Link
+        href="/"
+        className="font-display italic font-semibold text-display text-text-primary hover:text-link"
+      >
         Scenewright
-      </span>
+      </Link>
       <div className="flex-1" />
       <Link
         href="/library"

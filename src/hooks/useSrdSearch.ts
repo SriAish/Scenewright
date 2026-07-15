@@ -46,6 +46,8 @@ export interface UseSrdSearchParams {
   browse: boolean;
   limit?: number;
   page?: number;
+  /** Browse-mode-only name filter, used by the library's SRD source view. The finder never sets this. */
+  name?: string;
   enabled: boolean;
 }
 
@@ -55,6 +57,7 @@ function buildQueryString(params: UseSrdSearchParams): string {
   if (params.browse) {
     search.set("browse", "true");
     search.set("page", String(params.page ?? 1));
+    if (params.name?.trim()) search.set("name", params.name.trim());
   } else {
     search.set("limit", String(params.limit ?? 3));
     if (params.prose.trim()) search.set("prose", params.prose.trim());

@@ -71,6 +71,51 @@ export async function srdAdd(input: SrdAddInput) {
   });
 }
 
+export interface SrdAddToLibraryInput {
+  srdEntryId: string;
+  userId: string;
+}
+
+/**
+ * srdAddToLibrary: same SRD-to-app-schema mapping as srdAdd, targeting
+ * the library scope (campaign_id null) instead of a campaign. No
+ * campaign ownership check applies (there is no target campaign);
+ * userId is always the authenticated caller's own id, so the row is
+ * only ever created in the caller's own library. lineage_root_id stays
+ * null, same convention as srdAdd: the copy is a new root. No mention
+ * flattening or referenced-entity prompt: SRD entries have no backstory.
+ */
+export async function srdAddToLibrary(input: SrdAddToLibraryInput) {
+  const db = getDb();
+
+  return db.transaction(async (tx) => {
+    const [srdEntry] = await tx.select().from(srdEntries).where(eq(srdEntries.id, input.srdEntryId));
+    if (!srdEntry) {
+      throw new ForkNotFoundError("SRD entry not found");
+    }
+
+    const type = srdEntry.type as "monster" | "item";
+    const data = type === "monster" ? mapMonsterData(srdEntry) : mapItemData(srdEntry);
+    const summary = deriveSummary(data.description);
+
+    const [created] = await tx
+      .insert(entities)
+      .values({
+        userId: input.userId,
+        campaignId: null,
+        type,
+        name: srdEntry.name,
+        summary,
+        data,
+        backstoryJson: null,
+        lineageRootId: null,
+        srdSourceId: srdEntry.id,
+      })
+      .returning();
+    return created;
+  });
+}
+
 /*
   Cross-scope backstory reference resolution, shared by the read-only
   preview endpoint (screen 12's confirm step, called with the plain db

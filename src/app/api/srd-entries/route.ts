@@ -16,6 +16,7 @@ const querySchema = z.object({
   type: z.enum(["monster", "item"]),
   prose: z.string().optional(),
   browse: boolStringSchema.optional(),
+  name: z.string().optional(),
   limit: z.coerce.number().int().positive().optional(),
   page: z.coerce.number().int().positive().optional(),
   pageSize: z.coerce.number().int().positive().optional(),
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
       : { rarity: q.rarity, category: q.category, attunement: q.attunement === undefined ? undefined : q.attunement === "true" };
 
   if (q.browse === "true") {
-    const result = await browseSrdEntries({ type: q.type, filters, page: q.page, pageSize: q.pageSize });
+    const result = await browseSrdEntries({ type: q.type, filters, nameQuery: q.name, page: q.page, pageSize: q.pageSize });
     return NextResponse.json(result);
   }
 

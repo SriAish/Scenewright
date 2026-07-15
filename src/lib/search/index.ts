@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, isNotNull, lte, sql, type SQL } from "drizzle-orm";
+import { and, asc, eq, gte, ilike, isNotNull, lte, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
 import { srdEntries } from "@/db/schema";
 import { embedQuery } from "./embedder";
@@ -166,14 +166,18 @@ export async function searchSrdEntries(params: SearchParams): Promise<SrdResultP
 export interface BrowseParams {
   type: SrdType;
   filters?: SrdFilters;
+  /** Case-insensitive name substring filter, used by the library's SRD source view search box. Unset (as the finder always leaves it) applies no name condition. */
+  nameQuery?: string;
   page?: number;
   pageSize?: number;
 }
 
-/** Browse mode: alphabetical, paginated, still respecting whatever filters are set. */
+/** Browse mode: alphabetical, paginated, still respecting whatever filters (and optional name query) are set. */
 export async function browseSrdEntries(params: BrowseParams): Promise<SrdResultPage> {
   const db = getDb();
   const conditions = buildConditions(params.type, params.filters);
+  const nameQuery = params.nameQuery?.trim();
+  if (nameQuery) conditions.push(ilike(srdEntries.name, `%${nameQuery}%`));
   const pageSize = params.pageSize ?? DEFAULT_BROWSE_PAGE_SIZE;
   const page = params.page ?? 1;
 
