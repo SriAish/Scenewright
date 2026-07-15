@@ -102,7 +102,7 @@ export function FinderModal({ campaignId, type, onClose }: FinderModalProps) {
           <button
             type="submit"
             aria-label="Search"
-            className="shrink-0 w-[40px] h-[40px] rounded-sm bg-accent hover:bg-accent-hover text-white flex items-center justify-center cursor-pointer transition-colors duration-150"
+            className="shrink-0 w-[40px] h-[40px] rounded-sm bg-accent hover:bg-accent-hover text-on-accent flex items-center justify-center cursor-pointer transition-colors duration-150"
           >
             <SearchIcon />
           </button>

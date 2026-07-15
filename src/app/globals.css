@@ -1,85 +1,105 @@
 @import "tailwindcss";
 
 /*
-  Ravenholt design system tokens, transcribed from the Claude Design
-  MCP server (project "Ravenholt DnD Design System", tokens/colors.css,
-  tokens/typography.css, tokens/spacing.css, tokens/fonts.css), plus
-  status and accent colors sourced from the raw canvas frames in the
-  "Scene Editor Interface Design" project (dashboard, graph view, list
-  view, modals) where the formal token set did not cover a value.
+  Retheme (token-layer authoritative for color and type, per spec
+  amendment): base values are the exact hexes given in the amendment;
+  any token not directly named there is re-derived from those anchors
+  and documented inline. Claude Design frames remain authoritative for
+  layout and affordances only. Light mode unchanged.
 
-  Entity type "person" in the source design system corresponds to "npc"
-  in this app's schema; the color values are unchanged, only the token
-  name follows the schema's vocabulary.
+  Entity type "person" in the original source design system corresponds
+  to "npc" in this app's schema; only the token name follows the
+  schema's vocabulary.
+
+  Accent (below) is darkened one step off the amendment's literal
+  #6B7F5E to #5F7053: the literal value measured 3.91:1 against paper,
+  failing WCAG AA for the text-sized accent usages (tab bar, links,
+  labels, none large enough for the AA large-text exemption). #5F7053
+  is the smallest same-hue/same-saturation darkening that clears 4.5:1
+  with a safety margin (4.8:1). This is the one approved substitution;
+  every other value below is exact or a same-base re-derivation.
 */
 
 :root {
   /* ---- Base warm neutrals (parchment) ---- */
-  --parchment-100: oklch(0.99 0.006 75);
-  --parchment-200: oklch(0.975 0.011 75);
-  --parchment-300: oklch(0.94 0.006 75);
-  --parchment-border: oklch(0.88 0.008 75);
-  --parchment-border-soft: oklch(0.89 0.01 75);
+  --parchment-100: #fbfaf6; /* card surface, exact */
+  --parchment-200: #f9f8f3; /* panel: re-derived, interpolated 70% from canvas to card (same ratio as the prior ramp) */
+  --parchment-300: #f4f3ec; /* paper/canvas, exact */
+  --parchment-border: #dddbd0; /* border, exact */
+  --parchment-border-soft: #e6e4db; /* re-derived: border blended 30% toward card surface */
 
-  /* ---- Ink (cool slate text) ---- */
-  --ink-900: oklch(0.24 0.02 260);
-  --ink-700: oklch(0.35 0.02 260);
-  --ink-600: oklch(0.4 0.02 260);
-  --ink-500: oklch(0.45 0.02 260);
-  --ink-400: oklch(0.55 0.015 260);
-  --ink-350: oklch(0.62 0.01 260); /* also the graph view's edge stroke color, source: graph view canvas edge paths */
+  /* ---- Ink (warm neutral text) ---- */
+  --ink-900: #1c1b17; /* text primary, exact */
+  --ink-700: #47463e; /* text-button: re-derived, interpolated between primary and secondary */
+  --ink-600: #5b594f; /* text secondary, exact */
+  --ink-500: #6c6a60; /* text-label: re-derived, interpolated between secondary and placeholder */
+  --ink-400: #8f8d81; /* text placeholder, exact; numerically identical to status draft/not_run below, per the amendment */
+  --ink-350: #a7a598; /* also the graph view's edge stroke color: re-derived, extrapolated past placeholder by the prior ramp's step */
 
   /* ---- Neutral pill (draft / not_run) ---- */
-  --neutral-pill-bg: oklch(0.91 0 0);
-  --neutral-pill-text: oklch(0.4 0 0);
-  --neutral-pill-dot: oklch(0.55 0 0);
+  --neutral-pill-bg: #f2f1f0; /* re-derived: base blended 88% toward white */
+  --neutral-pill-text: #4f4e47; /* re-derived: base blended 45% toward black */
+  --neutral-pill-dot: #8f8d81; /* exact, given as the status base */
 
   /* ---- Entity accent: npc (source label "Person") ---- */
-  --entity-npc-bg: oklch(0.93 0.02 255);
-  --entity-npc-text: oklch(0.32 0.08 255);
+  --entity-npc-bg: #e3e9ed; /* exact */
+  --entity-npc-text: #4a6274; /* exact */
 
   /* ---- Entity accent: monster ---- */
-  --entity-monster-bg: oklch(0.9 0.05 20);
-  --entity-monster-text: oklch(0.38 0.09 20);
+  --entity-monster-bg: #ede0da; /* exact */
+  --entity-monster-text: #8a5546; /* exact */
 
   /* ---- Entity accent: item ---- */
-  --entity-item-bg: oklch(0.94 0.02 90);
-  --entity-item-text: oklch(0.4 0.08 90);
+  --entity-item-bg: #efe8d6; /* exact */
+  --entity-item-text: #8a7040; /* exact */
 
-  /* ---- Scene/campaign status: running (source: graph + list view, blue) ---- */
-  --status-running-bg: oklch(0.93 0.02 255);
-  --status-running-text: oklch(0.32 0.08 255);
-  --status-running-dot: oklch(0.5 0.13 255);
+  /* ---- Scene/campaign status: running (source: graph + list view, green) ---- */
+  --status-running-bg: #edf0ec; /* re-derived: base blended 88% toward white */
+  --status-running-text: #3b4634; /* re-derived: base blended 45% toward black */
+  --status-running-dot: #6b7f5e; /* exact, given as the status base; kept literal (unlike --accent below) since it is not used as text */
 
-  /* ---- Scene/campaign status: completed (source: graph + list view, green) ---- */
-  --status-completed-bg: oklch(0.93 0.03 145);
-  --status-completed-text: oklch(0.4 0.1 145);
-  --status-completed-dot: oklch(0.55 0.13 145);
+  /* ---- Scene/campaign status: completed (source: graph + list view, blue-slate) ---- */
+  --status-completed-bg: #eceef0; /* re-derived: base blended 88% toward white */
+  --status-completed-text: #344049; /* re-derived: base blended 45% toward black */
+  --status-completed-dot: #5e7485; /* exact, given as the status base */
 
-  /* ---- Scene status: skipped (source: dashed border, no dot, no distinct hue) ---- */
-  --status-skipped-bg: oklch(0.95 0.01 75);
-  --status-skipped-text: var(--ink-400);
-  --status-skipped-border: oklch(0.8 0.01 75);
+  /* ---- Scene status: skipped (amber; the amendment gives this its own
+     hue, unlike the prior ramp where skipped-text silently aliased the
+     placeholder ink) ---- */
+  --status-skipped-bg: #f5f1ec; /* re-derived: base blended 88% toward white */
+  --status-skipped-text: #5d4e34; /* re-derived: base blended 45% toward black */
+  --status-skipped-border: #ddd1bf; /* re-derived: base blended 60% toward white */
 
-  /* ---- Destructive ---- */
-  --danger-text: oklch(0.5 0.09 25);
-  --danger-border: oklch(0.9 0.03 25);
-  --danger-bg-hover: oklch(0.95 0.02 25);
+  /* ---- Destructive (red-family, muted to match the new palette) ---- */
+  --danger-text: #a14a38;
+  --danger-border: #e8d2cd; /* re-derived: danger-text blended 75% toward white */
+  --danger-bg-hover: #f4e9e7; /* re-derived: danger-text blended 88% toward white */
 
-  /* ---- Accent (source: single blue used for primary buttons, active tabs, links;
-     numerically identical to entity-npc-text) ---- */
-  --accent: oklch(0.32 0.08 255);
-  --accent-hover: oklch(0.28 0.09 255);
-  --link-hover: oklch(0.26 0.09 255);
+  /* ---- Accent (source: single sage green used for primary buttons,
+     active tabs, links; darkened from the amendment's literal #6B7F5E
+     for text-contrast AA, see file header) ---- */
+  --accent: #5f7053;
+  --accent-hover: #7c8a73; /* re-derived from the new base at the amendment's own base->hover lighten ratio (~18% toward white) */
+  --accent-tint: #e4e7e2; /* re-derived from the new base at the amendment's own base->tint lighten ratio (~83% toward white); selection/chip-style tint, currently unconsumed, see summary */
+  --link-hover: #4c5a42; /* re-derived: new accent blended 20% toward black, for a darker (not lighter) hover state on text links specifically */
 
   /* ---- Thumbnail placeholder diagonal stripe (source: .ecard-thumb) ---- */
-  --placeholder-stripe-light: oklch(0.9 0.01 75);
-  --placeholder-stripe-dark: oklch(0.85 0.01 75);
+  --placeholder-stripe-light: #e2e0d7; /* re-derived: border lightened ~15% toward white */
+  --placeholder-stripe-dark: #cdcbc0; /* re-derived: border blended 20% toward placeholder ink */
 
-  /* ---- Modal scrim ---- */
-  --modal-scrim: oklch(0.3 0.03 260 / 0.32);
+  /* ---- On-accent content (button/icon text on filled accent surfaces,
+     and knob/thumb surfaces sitting on accent or border tracks): same
+     warmed near-white as --color-surface-card-solid below, given its
+     own token since the role (content atop a colored surface) is
+     distinct from that one (a background surface itself). 5.21:1 on
+     accent, AA pass. ---- */
+  --on-accent: #fdfcfa;
 
-  /* ---- Shadows ---- */
+  /* ---- Modal scrim (re-hued to the new ink primary; alpha unchanged) ---- */
+  --modal-scrim: rgb(28 27 23 / 0.32);
+
+  /* ---- Shadows: unchanged per constraint (no shadow changes); still
+     reference the pre-retheme cool hue intentionally, out of scope ---- */
   --shadow-card-value: 0 1px 3px 0 oklch(0.3 0.02 260 / 0.08);
   --shadow-popover-value: 0 4px 16px 0 oklch(0.3 0.02 260 / 0.14);
 }
@@ -89,7 +109,7 @@
   --color-surface-canvas: var(--parchment-300);
   --color-surface-panel: var(--parchment-200);
   --color-surface-card: var(--parchment-100);
-  --color-surface-card-solid: #ffffff;
+  --color-surface-card-solid: #fdfcfa; /* re-derived: card surface blended 40% further toward white; kept as the brightest anchor above --color-surface-card, warmed off pure white so it doesn't clash against the parchment family */
   --color-border-default: var(--parchment-border);
   --color-border-soft: var(--parchment-border-soft);
 
@@ -103,8 +123,10 @@
   /* Accent / links */
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-accent-tint: var(--accent-tint); /* selection/chip-style tint; no current component binds to it, see summary */
   --color-link: var(--accent);
   --color-link-hover: var(--link-hover);
+  --color-on-accent: var(--on-accent);
 
   /* Entity type accents */
   --color-entity-npc-bg: var(--entity-npc-bg);
@@ -153,8 +175,8 @@
   --color-placeholder-stripe-dark: var(--placeholder-stripe-dark);
 
   /* Fonts */
-  --font-ui: var(--font-work-sans), sans-serif;
-  --font-display: var(--font-lora), serif;
+  --font-ui: var(--font-alegreya-sans), sans-serif;
+  --font-display: var(--font-cormorant-garamond), serif;
 
   /* Type scale */
   --text-display: 19px;

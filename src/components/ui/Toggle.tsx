@@ -19,7 +19,7 @@ export function Toggle({ checked, onChange, label, disabled, className }: Toggle
       className={`relative w-[38px] h-[22px] rounded-pill shrink-0 transition-colors duration-150 ${checked ? "bg-accent" : "bg-border-default"} ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"} ${className ?? ""}`}
     >
       <span
-        className={`absolute top-[2px] left-[2px] w-[18px] h-[18px] rounded-pill bg-white shadow-card transition-transform duration-150 ${checked ? "translate-x-[16px]" : "translate-x-0"}`}
+        className={`absolute top-[2px] left-[2px] w-[18px] h-[18px] rounded-pill bg-on-accent shadow-card transition-transform duration-150 ${checked ? "translate-x-[16px]" : "translate-x-0"}`}
       />
     </button>
   );

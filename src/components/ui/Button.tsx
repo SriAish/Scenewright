@@ -17,7 +17,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 const variantClasses: Record<ButtonVariant, string> = {
   // Filled accent button. Source: "New campaign" / "New scene" / "Generate" buttons.
   primary:
-    "bg-accent text-white border border-accent hover:bg-accent-hover hover:border-accent-hover",
+    "bg-accent text-on-accent border border-accent hover:bg-accent-hover hover:border-accent-hover",
   // Outline button. Source: Button.jsx variant="neutral", used for Replace/Remove/Upload/Add Link.
   secondary:
     "bg-surface-card-solid text-text-button border border-border-soft hover:bg-surface-panel",

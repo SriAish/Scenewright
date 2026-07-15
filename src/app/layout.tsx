@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import { Work_Sans, Lora } from "next/font/google";
+import { Cormorant_Garamond, Alegreya_Sans } from "next/font/google";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
-const workSans = Work_Sans({
-  variable: "--font-work-sans",
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant-garamond",
   subsets: ["latin"],
+  weight: ["600", "700"],
   style: ["normal", "italic"],
 });
 
-const lora = Lora({
-  variable: "--font-lora",
+const alegreyaSans = Alegreya_Sans({
+  variable: "--font-alegreya-sans",
   subsets: ["latin"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "700"],
+  style: ["normal"],
 });
 
 export const metadata: Metadata = {
@@ -28,7 +30,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${workSans.variable} ${lora.variable} h-full antialiased`}
+      className={`${cormorantGaramond.variable} ${alegreyaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         <QueryProvider>{children}</QueryProvider>
